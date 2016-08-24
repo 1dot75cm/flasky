@@ -1,5 +1,6 @@
 # coding: utf-8
 import unittest
+import time
 from app import create_app, db
 from app.models import User
 
@@ -40,3 +41,29 @@ class UserModelTestCase(unittest.TestCase):
         u = User(password='cat')
         u2 = User(password='cat')
         self.assertTrue(u.password_hash != u2.password_hash)
+
+    def test_valid_confirmation_token(self):
+        '''测试有效的确认令牌'''
+        u = User(password='cat')
+        db.session.add(u)
+        db.session.commit()
+        token = u.generate_confirmation_token()
+        self.assertTrue(u.confirm(token))
+
+    def test_invalid_confirmation_token(self):
+        '''测试无效的确认令牌'''
+        u1 = User(password='cat')
+        u2 = User(password='dog')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+        token = u1.generate_confirmation_token()
+        self.assertFalse(u2.confirm(token))
+
+    def test_expired_confirmation_token(self):
+        '''测试过期确认令牌'''
+        u = User(password='cat')
+        db.session.add(u)
+        db.session.commit()
+        token = u.generate_confirmation_token(1)
+        time.sleep(2)
+        self.assertFalse(u.confirm(token))
