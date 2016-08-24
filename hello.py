@@ -9,6 +9,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
+from flask_mail import Mail, Message
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,12 +19,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')  # 数据库URI
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True  # 请求结束后, 自动提交
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = '587'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[Flasky]'
+app.config['FLASKY_MAIL_SENDER'] = 'Flasky Admin <flasky@example.com>'
+app.config['FLASKY_ADMIN'] = os.getenv('FLASKY_ADMIN')
 
 manager = Manager(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
 
 
 class Role(db.Model):
@@ -56,6 +66,15 @@ class NameForm(Form):
     submit = SubmitField('Submit')  # 提交按钮
 
 
+def send_email(to, subject, template, **kwargs):
+    '''发送邮件'''
+    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
+                  sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    mail.send(msg)
+
+
 def make_shell_context():
     '''定义向Shell导入的对象'''
     return dict(app=app, db=db, User=User, Role=Role)
@@ -84,6 +103,9 @@ def index():
             user = User(username=form.name.data)  # 创建 user 对象
             db.session.add(user)  # 添加数据至 db 会话
             session['known'] = False
+            if app.config['FLASKY_ADMIN']:  # 新用户注册, 向管理员发邮件
+                send_email(app.config['FLASKY_ADMIN'], 'New User',
+                           'mail/new_user', user=user)
         else:
             session['known'] = True  # 根据用户是否注册, 在前端显示不同内容
         session['name'] = form.name.data  # 使用会话保存 name
