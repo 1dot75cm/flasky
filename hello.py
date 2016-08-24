@@ -7,6 +7,16 @@ app = Flask(__name__)  # 实例化app
 manager = Manager(app)
 bootstrap = Bootstrap(app)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    '''自定义404页面'''
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    '''自定义500页面'''
+    return render_template('500.html'), 500
+
 @app.route('/')
 def index():
     '''主页视图函数'''
