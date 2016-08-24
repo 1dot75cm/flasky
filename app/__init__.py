@@ -4,12 +4,17 @@ from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from config import config
 
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
+
+login_manager = LoginManager()
+login_manager.session_protection = 'strong'  # 会话安全等级
+login_manager.login_view = 'auth.login'  # 登陆页endpoint
 
 
 def create_app(config_name):
@@ -24,6 +29,7 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    login_manager.init_app(app)
 
     # 附加路由和错误页面, 在蓝图中定义
     from .main import main as main_blueprint
