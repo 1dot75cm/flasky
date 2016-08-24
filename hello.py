@@ -1,6 +1,6 @@
 # coding: utf-8
 import os
-from flask import Flask, render_template, session, redirect, url_for, flash
+from flask import Flask, render_template, session, redirect, url_for
 from flask_script import Manager
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
@@ -16,6 +16,7 @@ app.config['SECRET_KEY'] = 'secret_key_string'  # 用于加密 session 的密钥
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')  # 数据库URI
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True  # 请求结束后, 自动提交
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 manager = Manager(app)
 bootstrap = Bootstrap(app)
@@ -69,12 +70,17 @@ def index():
     '''主页视图函数'''
     form = NameForm()
     if form.validate_on_submit():  # 验证表单
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('Looks like you have changed your name!')
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)  # 创建 user 对象
+            db.session.add(user)  # 添加数据至 db 会话
+            session['known'] = False
+        else:
+            session['known'] = True  # 根据用户是否注册, 在前端显示不同内容
         session['name'] = form.name.data  # 使用会话保存 name
         return redirect(url_for('index'))
-    return render_template('index.html', form=form, name=session.get('name'))
+    return render_template('index.html', form=form, name=session.get('name'),
+                           known=session.get('known', False))
 
 
 if __name__ == '__main__':
