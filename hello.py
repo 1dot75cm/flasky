@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask, render_template, session, redirect, url_for, flash
 from flask_script import Manager
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
@@ -36,6 +36,9 @@ def index():
     '''主页视图函数'''
     form = NameForm()
     if form.validate_on_submit():  # 验证表单
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('Looks like you have changed your name!')
         session['name'] = form.name.data  # 使用会话保存 name
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'))
