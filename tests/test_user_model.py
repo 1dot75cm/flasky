@@ -1,6 +1,7 @@
 # coding: utf-8
 import unittest
 import time
+from datetime import datetime
 from app import create_app, db
 from app.models import User, AnonymousUser, Role, Permission
 
@@ -127,3 +128,23 @@ class UserModelTestCase(unittest.TestCase):
         '''测试匿名用户权限'''
         u = AnonymousUser()
         self.assertFalse(u.can(Permission.FOLLOW))
+
+    def test_timestamps(self):
+        '''测试时间戳'''
+        u = User(password='cat')
+        db.session.add(u)
+        db.session.commit()
+        self.assertTrue(
+            (datetime.utcnow() - u.member_since).total_seconds() < 3)
+        self.assertTrue(
+            (datetime.utcnow() - u.last_seen).total_seconds() < 3)
+
+    def test_ping(self):
+        '''测试更新访问时间'''
+        u = User(password='cat')
+        db.session.add(u)
+        db.session.commit()
+        time.sleep(2)
+        last_seen_before = u.last_seen
+        u.ping()
+        self.assertTrue(u.last_seen > last_seen_before)
