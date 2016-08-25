@@ -86,3 +86,32 @@ class UserModelTestCase(unittest.TestCase):
         token = u1.generate_reset_token()
         self.assertFalse(u2.reset_password(token, 'horse'))
         self.assertTrue(u2.verify_password('dog'))
+
+    def test_valid_email_change_token(self):
+        '''测试有效的邮箱修改令牌'''
+        u = User(email='john@example.com', password='cat')
+        db.session.add(u)
+        db.session.commit()
+        token = u.generate_email_change_token('susan@example.com')
+        self.assertTrue(u.change_email(token))
+        self.assertTrue(u.email == 'susan@example.com')
+
+    def test_invalid_email_change_token(self):
+        '''测试无效的邮箱修改令牌'''
+        u1 = User(email='john@example.com', password='cat')
+        u2 = User(email='susan@example.org', password='dog')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+        token = u1.generate_email_change_token('david@example.com')
+        self.assertFalse(u2.change_email(token))
+        self.assertTrue(u2.email == 'susan@example.org')
+
+    def test_duplicate_email_change_token(self):
+        '''测试重复的邮箱修改令牌'''
+        u1 = User(email='john@example.com', password='cat')
+        u2 = User(email='susan@example.org', password='dog')
+        db.session.add_all([u1, u2])
+        db.session.commit()
+        token = u2.generate_email_change_token('john@example.com')
+        self.assertFalse(u2.change_email(token))
+        self.assertTrue(u2.email == 'susan@example.org')

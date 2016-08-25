@@ -79,6 +79,29 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         return True
 
+    def generate_email_change_token(self, new_email, expiration=3600):
+        '''生成更改邮箱令牌'''
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'change_email': self.id, 'new_email': new_email})
+
+    def change_email(self, token):
+        '''验证更改邮箱令牌'''
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+        if data.get('change_email') != self.id:  # 检查id是否和已登陆用户匹配
+            return False
+        new_email = data.get('new_email')
+        if new_email is None:  # email为空
+            return False
+        if self.query.filter_by(email=new_email).first() is not None:  # email已存在
+            return False
+        self.email = new_email
+        db.session.add(self)
+        return True
+
     def __repr__(self):
         return '<User %r>' % self.username
 
