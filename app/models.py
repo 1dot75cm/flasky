@@ -69,6 +69,9 @@ class User(db.Model, UserMixin):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)  # 注册日期
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)  # 最后访问日期
     avatar_hash = db.Column(db.String(32))  # 头像hash
+    posts = db.relationship('Post', backref='author', lazy='dynamic')  # 返回与用户关联的文章列表
+    # backref 向 Post 模型添加 author 属性, 从而定义反向关系
+    # author 属性可代替 author_id 访问 User 模型, 获取模型对象
 
     def __init__(self, **kwargs):
         '''构造函数定义用户默认角色'''
@@ -201,3 +204,16 @@ login_manager.anonymous_user = AnonymousUser
 def load_user(user_id):
     '''扩展使用该回调函数加载用户'''
     return User.query.get(int(user_id))  # 返回用户对象或 None
+
+
+class Post(db.Model):
+    '''posts表模型'''
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128), index=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return '<Post %r>' % self.title
