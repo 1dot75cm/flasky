@@ -29,7 +29,8 @@ def index():
 def user(username):
     '''用户页视图函数'''
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+    posts = user.posts.order_by(Post.timestamp.desc()).all()  # 通过关系查询用户发布的文章
+    return render_template('user.html', user=user, posts=posts)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])

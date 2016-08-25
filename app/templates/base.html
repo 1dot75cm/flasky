@@ -67,4 +67,5 @@
 {{ super() }}
 <!-- 引入 moment.js 库 -->
 {{ moment.include_moment() }}
+<script type="text/javascript" src="{{ url_for('static', filename='posts.js') }}"></script>
 {% endblock %}
