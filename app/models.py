@@ -2,8 +2,17 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
+
+
+class Permission:
+    '''权限常量'''
+    FOLLOW = 0x01  # 关注用户
+    COMMENT = 0x02  # 发表评论
+    WRITE_ARTICLES = 0x04  # 写文章
+    MODERATE_COMMENTS = 0x08  # 管理评论
+    ADMINISTER = 0x80  # 管理员
 
 
 class Role(db.Model):
@@ -11,9 +20,33 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)  # 默认角色
+    permissions = db.Column(db.Integer)  # 角色具有的权限
     users = db.relationship('User', backref='role', lazy='dynamic')  # 返回与角色关联的用户列表
     # backref 向 User 模型添加 role 属性, 从而定义反向关系
     # role 属性可代替 role_id 访问 Role 模型, 获取模型对象
+
+    @staticmethod
+    def insert_roles():
+        '''创建角色'''
+        roles = {
+            'User': (Permission.FOLLOW |
+                     Permission.COMMENT |
+                     Permission.WRITE_ARTICLES, True),
+            'Moderator': (Permission.FOLLOW |
+                          Permission.COMMENT |
+                          Permission.WRITE_ARTICLES |
+                          Permission.MODERATE_COMMENTS, False),
+            'Administrator': (0xff, False)
+        }
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)  # 创建角色
+            role.permissions = roles[r][0]
+            role.default = roles[r][1]
+            db.session.add(role)
+        db.session.commit()
 
     def __repr__(self):
         return '<Role %r>' % self.name
@@ -28,6 +61,14 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))  # 外键, 值为 roles.id
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)  # 账户是否经过邮箱验证
+
+    def __init__(self, **kwargs):
+        '''构造函数定义用户默认角色'''
+        super(User, self).__init__(**kwargs)
+        if self.email == current_app.config['FLASKY_ADMIN']:
+            self.role = Role.query.filter_by(permissions=0xff).first()
+        if self.role is None:
+            self.role = Role.query.filter_by(default=True).first()
 
     @property
     def password(self):
@@ -102,8 +143,29 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         return True
 
+    def can(self, permissions):
+        '''检查用户是否有指定权限'''
+        return self.role is not None and \
+            (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        '''检查是否为管理员'''
+        return self.can(Permission.ADMINISTER)
+
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+class AnonymousUser(AnonymousUserMixin):
+    '''匿名用户类'''
+    # 无需确定是否登陆, 就可以检查权限
+    def can(self, permissions):
+        return False
+
+    def is_administrator(self):
+        return False
+
+login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.user_loader
