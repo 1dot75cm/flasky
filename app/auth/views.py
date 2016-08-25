@@ -5,7 +5,8 @@ from . import auth
 from .. import db
 from ..models import User
 from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
+    PasswordResetRequestForm, PasswordResetForm
 
 
 @auth.before_app_request
@@ -105,3 +106,43 @@ def change_password():
         else:
             flash('Invalid password.')
     return render_template('auth/change_password.html', form=form)
+
+
+@auth.route('/reset', methods=['GET', 'POST'])
+def password_reset_request():
+    '''请求密码重置视图(忘记密码)'''
+    if not current_user.is_anonymous:  # 用户已登陆
+        return redirect(url_for('main.index'))
+    form = PasswordResetRequestForm()
+    if form.validate_on_submit():  # 验证表单
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            token = user.generate_reset_token()  # 生成token
+            send_email(user.email, 'Reset Your Password',
+                       'auth/email/reset_password',
+                       user=user, token=token,
+                       next=request.args.get('next'))  # 发送重置密码邮件
+            flash('An email with instructions to reset your password has been'
+                  ' sent to you.')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Email address is unknown.')
+    return render_template('auth/reset_password.html', form=form)
+
+
+@auth.route('/reset/<token>', methods=['GET', 'POST'])
+def password_reset(token):
+    '''密码重置视图(忘记密码)'''
+    if not current_user.is_anonymous:  # 用户已登陆
+        return redirect(url_for('main.index'))
+    form = PasswordResetForm()
+    if form.validate_on_submit():  # 验证表单
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            return redirect(url_for('main.index'))
+        if user.reset_password(token, form.password.data):  # token验证通过, 则重置密码
+            flash('Your password has been updated.')
+        else:
+            flash('Your password has been update failed.')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html', form=form)
