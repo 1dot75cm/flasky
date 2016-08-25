@@ -68,6 +68,7 @@ class User(db.Model, UserMixin):
     about_me = db.Column(db.Text())  # 自我介绍
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)  # 注册日期
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)  # 最后访问日期
+    avatar_hash = db.Column(db.String(32))  # 头像hash
 
     def __init__(self, **kwargs):
         '''构造函数定义用户默认角色'''
@@ -76,6 +77,9 @@ class User(db.Model, UserMixin):
             self.role = Role.query.filter_by(permissions=0xff).first()
         if self.role is None:
             self.role = Role.query.filter_by(default=True).first()
+        if self.email is not None and self.avatar_hash is None:
+            self.avatar_hash = hashlib.md5(
+                self.email.encode('utf-8')).hexdigest()
 
     @property
     def password(self):
@@ -147,6 +151,8 @@ class User(db.Model, UserMixin):
         if self.query.filter_by(email=new_email).first() is not None:  # email已存在
             return False
         self.email = new_email
+        self.avatar_hash = hashlib.md5(
+            self.email.encode('utf-8')).hexdigest()
         db.session.add(self)
         return True
 
@@ -170,7 +176,8 @@ class User(db.Model, UserMixin):
             url = 'https://secure.gravatar.com/avatar'
         else:
             url = 'http://www.gravatar.com/avatar'
-        hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+        hash = self.avatar_hash or hashlib.md5(
+            self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
 
