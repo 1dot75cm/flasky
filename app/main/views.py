@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm
@@ -21,16 +21,27 @@ def index():
         db.session.add(post)
         flash('Your article has been updated.')
         return redirect(url_for('.index'))
-    posts = Post.query.order_by(Post.timestamp.desc()).all()  # 按时间戳降序排列文章
-    return render_template('index.html', form=form, posts=posts)
+    page = request.args.get('page', 1, type=int)  # 默认第一页
+    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)  # 按时间戳排序, 查询某页数据
+        # paginate(页数, per_page每页项数, error_out页数超出范围返回404)
+    posts = pagination.items
+    return render_template('index.html', form=form, posts=posts,
+                           pagination=pagination)
 
 
 @main.route('/user/<username>')
 def user(username):
     '''用户页视图函数'''
     user = User.query.filter_by(username=username).first_or_404()
-    posts = user.posts.order_by(Post.timestamp.desc()).all()  # 通过关系查询用户发布的文章
-    return render_template('user.html', user=user, posts=posts)
+    page = request.args.get('page', 1, type=int)
+    pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)  # 通过关系查询用户发布的文章, 按时间戳排序, 查询某页数据
+    posts = pagination.items
+    return render_template('user.html', user=user, posts=posts,
+                           pagination=pagination)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])

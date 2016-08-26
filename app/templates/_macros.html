@@ -1,0 +1,39 @@
+{% macro pagination_widget(pagination, endpoint) %}
+<!-- 如果总记录数大于每页项数, 则显示分页导航 -->
+{% if pagination.total > pagination.per_page %}
+<ul class="pagination">
+    <!-- 如果没有上一页, 则添加 disabled 类 -->
+    <li{% if not pagination.has_prev %} class="disabled"{% endif %}>
+        <!-- 如果有上一页, 则添加 URL -->
+        <a href="{% if pagination.has_prev %}{{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}{% else %}#{% endif %}">
+            &laquo;
+        </a>
+    </li>
+    <!-- iter_pages() 返回所有页数的列表, 分隔符为 None -->
+    {% for p in pagination.iter_pages() %}
+        {% if p %}
+            <!-- 如果为当前页, 则使用 active 高亮 -->
+            {% if p == pagination.page %}
+            <li class="active">
+                <!-- url_for 接收所有关键字参数, 而宏参数列表无需添加 **kwargs -->
+                <a href="{{ url_for(endpoint, page=p, **kwargs) }}">{{ p }}</a>
+            </li>
+            {% else %}
+            <li>
+                <a href="{{ url_for(endpoint, page=p, **kwargs) }}">{{ p }}</a>
+            </li>
+            {% endif %}
+        {% else %}
+            <li class="disabled"><a href="#">&hellip;</a></li>  <!-- 分隔符 -->
+        {% endif %}
+    {% endfor %}
+    <!-- 如果没有下一页, 则添加 disabled 类 -->
+    <li{% if not pagination.has_next %} class="disabled"{% endif %}>
+        <!-- 如果有下一页, 则添加 URL -->
+        <a href="{% if pagination.has_next %}{{ url_for(endpoint, page=pagination.next_num, **kwargs) }}{% else %}#{% endif %}">
+            &raquo;
+        </a>
+    </li>
+</ul>
+{% endif %}
+{% endmacro %}
