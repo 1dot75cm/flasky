@@ -89,3 +89,10 @@ def edit_profile_admin(id):
     form.location.data = user.location
     form.about_me.data = user.about_me
     return render_template('edit_profile.html', form=form, user=user)
+
+
+@main.route('/post/<int:id>')
+def post(id):
+    '''文章页视图函数'''
+    post = Post.query.get_or_404(id)
+    return render_template('post.html', posts=[post])  # 传入列表为了复用 _posts.html 模板
