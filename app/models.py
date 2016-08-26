@@ -1,6 +1,8 @@
 # coding: utf-8
 import hashlib
+import bleach
 from datetime import datetime
+from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request
@@ -235,6 +237,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), index=True)
     body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
@@ -255,5 +258,24 @@ class Post(db.Model):
             db.session.add(p)
             db.session.commit()
 
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        '''将 Markdown 转为 HTML'''
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p', 'img']
+        allowed_attrs = {'a': ['href', 'title'], 'abbr': ['title'],
+                         'acronym': ['title'], 'img': ['alt', 'src']}
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, attributes=allowed_attrs, strip=True))
+        # 1. markdown() 将 md 转为 html
+        # 2. bleach.clean() 清除不在白名单中的标签
+        # 3. bleach.linkify() 将 URL 转为 <a> 标签
+
     def __repr__(self):
         return '<Post %r>' % self.title
+
+db.event.listen(Post.body, 'set', Post.on_changed_body)
+# on_changed_body 函数注册在 body 字段上, 是 SQLAlchemy 'set' 事件的监听程序,
+# 只要 Post 类实例的 body 字段设置了新值, 就会自动调用 on_changed_body 函数渲染 HTML

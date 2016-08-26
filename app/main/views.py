@@ -18,6 +18,7 @@ def index():
                     body=form.body.data,
                     author=current_user._get_current_object())
                     # 使用 _get_current_object() 返回数据库需要的实际用户对象
+                    # 更新 body 字段后, 会自动调用 on_changed_body 渲染 HTML
         db.session.add(post)
         flash('Your article has been updated.')
         return redirect(url_for('.index'))
