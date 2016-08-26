@@ -80,3 +80,9 @@ div.flask-pagedown-preview h3 {
 .post-body h3 {
     font-size: 120%;
 }
+
+textarea {
+    width: auto;
+    min-height: 70px;
+    overflow: hidden;  // 隐藏导航条
+}
