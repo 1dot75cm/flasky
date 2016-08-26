@@ -73,6 +73,29 @@ class User(db.Model, UserMixin):
     # backref 向 Post 模型添加 author 属性, 从而定义反向关系
     # author 属性可代替 author_id 访问 User 模型, 获取模型对象
 
+    @staticmethod
+    def generate_fake(count=100):
+        '''生成虚拟用户数据'''
+        from sqlalchemy.exc import IntegrityError
+        from random import seed
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            u = User(email=forgery_py.internet.email_address(),
+                     username=forgery_py.internet.user_name(True),
+                     password=forgery_py.lorem_ipsum.word(),
+                     confirmed=True,
+                     name=forgery_py.name.full_name(),
+                     location=forgery_py.address.city(),
+                     about_me=forgery_py.lorem_ipsum.sentence(),
+                     member_since=forgery_py.date.date(True))
+            db.session.add(u)
+            try:
+                db.session.commit()
+            except IntegrityError:  # username, email有重复数据, 则回滚会话
+                db.session.rollback()
+
     def __init__(self, **kwargs):
         '''构造函数定义用户默认角色'''
         super(User, self).__init__(**kwargs)
@@ -214,6 +237,23 @@ class Post(db.Model):
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @staticmethod
+    def generate_fake(count=100):
+        '''生成虚拟文章数据'''
+        from random import seed, randint
+        import forgery_py
+
+        seed()
+        user_count = User.query.count()  # 用户总数
+        for i in range(count):
+            u = User.query.offset(randint(0, user_count-1)).first()  # 随机选择用户
+            p = Post(title=forgery_py.lorem_ipsum.title(),
+                     body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
+                     timestamp=forgery_py.date.date(True),
+                     author=u)
+            db.session.add(p)
+            db.session.commit()
 
     def __repr__(self):
         return '<Post %r>' % self.title
