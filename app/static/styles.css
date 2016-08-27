@@ -7,6 +7,15 @@
     margin-left: 280px;
 }
 
+div.post-tabs {
+    margin-top: 16px;
+}
+
+div.post-tabs ul.posts {
+    margin: 0px;
+    border-top: none;
+}
+
 ul.posts {
     list-style-type: none;
     padding: 0px;
