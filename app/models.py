@@ -96,6 +96,9 @@ class User(db.Model, UserMixin):
                                 cascade='all, delete-orphan')  # 返回关注我的用户列表
     # backref 向 Follow 模型添加 followed 属性, 从而定义反向关系
     # followed 属性可代替 followed_id 引用 User 模型, 获取与 followed 相关的 Follow 模型对象
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')  # 返回与用户关联的评论列表
+    # backref 向 Comment 模型添加 author 属性, 从而定义反向关系
+    # author 属性可代替 author_id 引用 User 模型, 获取与 author 相关的 Comment 模型对象
 
     @staticmethod
     def generate_fake(count=100):
@@ -300,6 +303,9 @@ class Post(db.Model):
     body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    comments = db.relationship('Comment', backref='post', lazy='dynamic')  # 返回与文章相关的评论列表
+    # backref 向 Comment 模型添加 post 属性, 从而定义反向关系
+    # post 属性可代替 post_id 引用 Post 模型, 获取与 post 相关的 Comment 模型对象
 
     @staticmethod
     def generate_fake(count=100):
@@ -339,3 +345,29 @@ class Post(db.Model):
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 # on_changed_body 函数注册在 body 字段上, 是 SQLAlchemy 'set' 事件的监听程序,
 # 只要 Post 类实例的 body 字段设置了新值, 就会自动调用 on_changed_body 函数渲染 HTML
+
+
+class Comment(db.Model):
+    '''comments表模型'''
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    disabled = db.Column(db.Boolean)  # 用于管理员禁用不当言论
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        '''将 Markdown 转为 HTML'''
+        # 评论要求更严, 删除段落相关的标签, 只留下格式化字符的标签
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
+                        'strong', 'p', 'img']
+        allowed_attrs = {'a': ['href', 'title'], 'abbr': ['title'],
+                         'acronym': ['title'], 'img': ['alt', 'src']}
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, attributes=allowed_attrs, strip=True))
+
+db.event.listen(Comment.body, 'set', Comment.on_changed_body)  # 定义事件, 修改 body 时, 渲染 md

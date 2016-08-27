@@ -2,7 +2,7 @@
 # coding: utf-8
 import os
 from app import create_app, db
-from app.models import User, Follow, Role, Permission, Post
+from app.models import User, Follow, Role, Permission, Post, Comment
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -14,7 +14,7 @@ migrate = Migrate(app, db)
 def make_shell_context():
     '''定义向Shell导入的对象'''
     return dict(app=app, db=db, User=User, Follow=Follow, Role=Role,
-                Permission=Permission, Post=Post)
+                Permission=Permission, Post=Post, Comment=Comment)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 
