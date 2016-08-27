@@ -86,3 +86,7 @@ textarea {
     min-height: 70px;
     overflow: hidden;  // 隐藏导航条
 }
+
+.table.followers tr {
+    border-bottom: 1px solid #e0e0e0;
+}
