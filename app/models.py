@@ -120,6 +120,15 @@ class User(db.Model, UserMixin):
             except IntegrityError:  # username, email有重复数据, 则回滚会话
                 db.session.rollback()
 
+    @staticmethod
+    def add_self_follows():
+        '''更新现有用户, 使用户关注自己'''
+        for user in User.query.all():
+            if not user.is_following(user):
+                user.follow(user)
+                db.session.add(user)
+        db.session.commit()
+
     def __init__(self, **kwargs):
         '''构造函数定义用户默认角色'''
         super(User, self).__init__(**kwargs)
@@ -130,6 +139,7 @@ class User(db.Model, UserMixin):
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(
                 self.email.encode('utf-8')).hexdigest()
+        self.followed.append(Follow(followed=self))
 
     @property
     def password(self):

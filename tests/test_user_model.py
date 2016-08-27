@@ -183,8 +183,8 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(u1.is_following(u2))  # u1 关注 u2
         self.assertFalse(u1.is_followed_by(u2))  # u1 未被 u2 关注
         self.assertTrue(u2.is_followed_by(u1))  # u2 被 u1 关注
-        self.assertTrue(u1.followed.count() == 1)  # u1 关注列表
-        self.assertTrue(u2.followers.count() == 1)  # 关注 u2 的列表
+        self.assertTrue(u1.followed.count() == 2)  # u1 关注列表
+        self.assertTrue(u2.followers.count() == 2)  # 关注 u2 的列表
         f = u1.followed.all()[-1]
         self.assertTrue(f.followed == u2)
         self.assertTrue(timestamp_before <= f.timestamp <= timestamp_after)
@@ -193,12 +193,12 @@ class UserModelTestCase(unittest.TestCase):
         u1.unfollow(u2)
         db.session.add(u1)
         db.session.commit()
-        self.assertTrue(u1.followed.count() == 0)
-        self.assertTrue(u2.followers.count() == 0)
-        self.assertTrue(Follow.query.count() == 0)
+        self.assertTrue(u1.followed.count() == 1)
+        self.assertTrue(u2.followers.count() == 1)
+        self.assertTrue(Follow.query.count() == 2)
         u2.follow(u1)
         db.session.add_all([u1, u2])
         db.session.commit()
         db.session.delete(u2)  # 删除 u2
         db.session.commit()
-        self.assertTrue(Follow.query.count() == 0)
+        self.assertTrue(Follow.query.count() == 1)
