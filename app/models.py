@@ -28,7 +28,7 @@ class Role(db.Model):
     permissions = db.Column(db.Integer)  # 角色具有的权限
     users = db.relationship('User', backref='role', lazy='dynamic')  # 返回与角色关联的用户列表
     # backref 向 User 模型添加 role 属性, 从而定义反向关系
-    # role 属性可代替 role_id 访问 Role 模型, 获取模型对象
+    # role 属性可代替 role_id 引用 Role 模型, 获取与角色相关的 User 模型对象
 
     @staticmethod
     def insert_roles():
@@ -56,6 +56,14 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
+class Follow(db.Model):
+    '''follows关联表模型'''
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)  # 关注者
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)  # 被关注者
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # 关注时间戳
+
+
 class User(db.Model, UserMixin):
     '''users表模型'''
     __tablename__ = 'users'
@@ -73,7 +81,21 @@ class User(db.Model, UserMixin):
     avatar_hash = db.Column(db.String(32))  # 头像hash
     posts = db.relationship('Post', backref='author', lazy='dynamic')  # 返回与用户关联的文章列表
     # backref 向 Post 模型添加 author 属性, 从而定义反向关系
-    # author 属性可代替 author_id 访问 User 模型, 获取模型对象
+    # author 属性可代替 author_id 引用 User 模型, 获取与用户相关的 Post 模型对象
+    followed = db.relationship('Follow',
+                               foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')  # 返回我关注的用户列表
+    # backref 向 Follow 模型添加 follower 属性, 从而定义反向关系
+    # follower 属性可代替 follower_id 引用 User 模型, 获取与 follower 相关的 Follow 模型对象
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')  # 返回关注我的用户列表
+    # backref 向 Follow 模型添加 followed 属性, 从而定义反向关系
+    # followed 属性可代替 followed_id 引用 User 模型, 获取与 followed 相关的 Follow 模型对象
 
     @staticmethod
     def generate_fake(count=100):
@@ -208,6 +230,28 @@ class User(db.Model, UserMixin):
             self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
+
+    def is_following(self, user):
+        '''判断我是否关注该用户'''
+        return self.followed.filter_by(
+            followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        '''判断该用户是否关注我'''
+        return self.followers.filter_by(
+            follower_id=user.id).first() is not None
+
+    def follow(self, user):
+        '''关注用户'''
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+
+    def unfollow(self, user):
+        '''取消关注'''
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
 
     def __repr__(self):
         return '<User %r>' % self.username
