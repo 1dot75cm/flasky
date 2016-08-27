@@ -253,6 +253,12 @@ class User(db.Model, UserMixin):
         if f:
             db.session.delete(f)
 
+    @property
+    def followed_posts(self):
+        '''关注用户发布的文章'''
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
+            .filter(Follow.follower_id == self.id)
+
     def __repr__(self):
         return '<User %r>' % self.username
 
