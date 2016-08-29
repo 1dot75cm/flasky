@@ -237,9 +237,9 @@ class User(db.Model, UserMixin):
     def gravatar(self, size=100, default='identicon', rating='g'):
         '''生成 Gravatar 头像 URL'''
         if request.is_secure:
-            url = 'https://secure.gravatar.com/avatar'
+            url = 'https://cn.gravatar.com/avatar'
         else:
-            url = 'http://www.gravatar.com/avatar'
+            url = 'http://cn.gravatar.com/avatar'
         hash = self.avatar_hash or hashlib.md5(
             self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
