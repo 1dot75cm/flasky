@@ -65,6 +65,12 @@
 
     {% block page_content %}{% endblock %}
 </div>
+<footer id="footer">
+    Copyright &copy; 2014-2016 <a href="{{ url_for('main.index') }}">Flasky</a>. Powered by
+    <a target="_blank" href="//github.com/1dot75cm/flasky">Flasky</a>,
+    <a target="_blank" href="//github.com/pallets/flask/">Flask</a> and
+    <a target="_blank" href="//github.com/twbs/bootstrap/">Bootstrap</a>.
+</footer>
 {% endblock %}
 
 {% block scripts %}

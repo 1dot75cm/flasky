@@ -140,3 +140,11 @@ textarea {
 .table.followers tr {
     border-bottom: 1px solid #e0e0e0;
 }
+
+#footer {
+    height: 50px;
+    line-height: 50px;
+    margin-top: 10px;
+    text-align: center;
+    color: #555;
+}
