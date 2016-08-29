@@ -1,2 +1,3 @@
 -r common.txt
 ForgeryPy==0.1
+httpie==0.9.6

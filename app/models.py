@@ -5,8 +5,9 @@ from datetime import datetime
 from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app, request
+from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin
+from app.exceptions import ValidationError
 from . import db, login_manager
 
 
@@ -272,6 +273,35 @@ class User(db.Model, UserMixin):
         return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
             .filter(Follow.follower_id == self.id)
 
+    def generate_auth_token(self, expiration):
+        '''生成用户认证令牌'''
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('ascii')  # 根据id生成令牌
+
+    @staticmethod
+    def verify_auth_token(token):
+        '''验证认证令牌'''
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])  # 返回用户对象
+
+    def to_json(self):
+        '''将用户转为 JSON'''
+        json_user = {
+            'url': url_for('api.get_user', id=self.id, _external=True),
+            'username': self.username,
+            'email': self.email.replace('@', '<AT>'),
+            'member_since': self.member_since,
+            'last_seen': self.last_seen,
+            'posts': url_for('api.get_user_posts', id=self.id, _external=True),
+            'followed_posts': url_for('api.get_user_followed_posts', id=self.id, _external=True),
+            'post_count': self.posts.count()
+        }
+        return json_user
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -339,6 +369,31 @@ class Post(db.Model):
         # 2. bleach.clean() 清除不在白名单中的标签
         # 3. bleach.linkify() 将 URL 转为 <a> 标签
 
+    def to_json(self):
+        '''将文章转为 JSON'''
+        json_post = {
+            'url': url_for('api.get_post', id=self.id, _external=True),
+            'title': self.title,
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author': url_for('api.get_user', id=self.author_id, _external=True),
+            'comments': url_for('api.get_post_comments', id=self.id, _external=True),
+            'comment_count': self.comments.count()
+        }
+        return json_post
+
+    @staticmethod
+    def from_json(json_post):
+        '''将 JSON 转为模型'''
+        title = json_post.get('title')
+        body = json_post.get('body')
+        if title is None or title == '':
+            raise ValidationError('post does not have a title')
+        if body is None or body == '':
+            raise ValidationError('post does not have a body')
+        return Post(title=title, body=body)
+
     def __repr__(self):
         return '<Post %r>' % self.title
 
@@ -369,5 +424,25 @@ class Comment(db.Model):
         target.body_html = bleach.linkify(bleach.clean(
             markdown(value, output_format='html'),
             tags=allowed_tags, attributes=allowed_attrs, strip=True))
+
+    def to_json(self):
+        '''将评论转为 JSON'''
+        json_comment = {
+            'url': url_for('api.get_comment', id=self.id, _external=True),
+            'post': url_for('api.get_post', id=self.post_id, _external=True),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author': url_for('api.get_user', id=self.author_id, _external=True),
+        }
+        return json_comment
+
+    @staticmethod
+    def from_json(json_comment):
+        '''将 JSON 转为模型'''
+        body = json_comment.get('body')
+        if body is None or body == '':
+            raise ValidationError('comment does not have a body')
+        return Comment(body=body)
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)  # 定义事件, 修改 body 时, 渲染 md
