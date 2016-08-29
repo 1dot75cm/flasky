@@ -24,3 +24,32 @@ $.fn.autoHeight = function() {
 
 $('textarea[id=flask-pagedown-body]').attr('autoHeight', 'True');
 $('textarea[autoHeight]').autoHeight();
+
+// 移动端减小导航条长度
+$(function() {
+    if ($(window).width() <= 720) {  // 可见区域宽
+        var curr = Number($('.pagination li.active a').text());
+        var last = $('.pagination li:last').prev().children().text(); // 倒数第二个
+        var list = ['1', String(curr-1), String(curr), String(curr+1), last];
+        if (curr == 1) {
+            list.push('3', '4', '5');
+        } else if (curr == 2) {
+            list.push('4', '5');
+        } else if (curr == 3) {
+            list.push('5');
+        } else if (curr == 4 || curr == 5) {
+            list.push('2');
+        }
+        $('.pagination li').each(function () {
+            var n = $(this).children().text();
+            if ($.inArray(n, list) != - 1 ||
+                String(Number(n)) == 'NaN') {
+                return true;  // 相当于continue
+            } else {
+                $(this).remove();
+            }
+        });
+        $('.page-header img').css('height', '40px');  // 调整用户页图片大小
+        $('.profile-header').css('margin-left', '50px');
+    }
+});
