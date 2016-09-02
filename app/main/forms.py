@@ -4,7 +4,7 @@ from wtforms import StringField, TextAreaField, BooleanField, SelectField, Submi
 from wtforms.validators import Required, Length, Email, Regexp
 from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
-from ..models import User, Role
+from ..models import User, Role, Category
 
 
 class NameForm(Form):
@@ -58,8 +58,16 @@ class EditProfileAdminForm(Form):
 class PostForm(Form):
     '''文章表单'''
     title = StringField('Title', validators=[Required()])
+    tag = StringField('Tags')
+    category = SelectField('Categories', coerce=int)
     body = PageDownField("What's on your mind?", validators=[Required()])
     submit = SubmitField('Submit')
+
+    def __init__(self, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        # 在 choices 属性设置 select 控件各选项, 格式: [(选项标识符, 显示文本), ...]
+        self.category.choices = [(cate.id, cate.name)
+            for cate in Category.query.order_by(Category.name).all()]
 
 
 class CommentForm(Form):

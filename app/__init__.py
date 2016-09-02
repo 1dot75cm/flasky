@@ -6,12 +6,23 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_pagedown import PageDown
+from sqlalchemy import MetaData
 from config import config
+
+# SQLite naming convention
+# https://github.com/miguelgrinberg/Flask-Migrate/issues/61#issuecomment-208131722
+metadata = MetaData(naming_convention = {
+    'ix': 'ix_%(column_0_label)s',  # index
+    'uq': 'uq_%(table_name)s_%(column_0_name)s',  # unique
+    'ck': 'ck_%(table_name)s_%(column_0_name)s',  # check
+    'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',  # foreign key
+    'pk': 'pk_%(table_name)s'  # primary key
+})
 
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
-db = SQLAlchemy()
+db = SQLAlchemy(metadata=metadata)
 pagedown = PageDown()
 
 login_manager = LoginManager()

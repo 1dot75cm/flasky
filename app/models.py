@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 import hashlib
 import bleach
 from datetime import datetime
@@ -336,6 +337,7 @@ class Post(db.Model):
     comments = db.relationship('Comment', backref='post', lazy='dynamic')  # 返回与文章相关的评论列表
     # backref 向 Comment 模型添加 post 属性, 从而定义反向关系
     # post 属性可代替 post_id 引用 Post 模型, 获取与 post 相关的 Comment 模型对象
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
 
     @staticmethod
     def generate_fake(count=100):
@@ -345,11 +347,14 @@ class Post(db.Model):
 
         seed()
         user_count = User.query.count()  # 用户总数
+        cate_count = Category.query.count()  # 分类总数
         for i in range(count):
             u = User.query.offset(randint(0, user_count-1)).first()  # 随机选择用户
+            c = Category.query.offset(randint(0, cate_count-1)).first()  # 随机选择分类
             p = Post(title=forgery_py.lorem_ipsum.title(),
                      body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
                      timestamp=forgery_py.date.date(True),
+                     category=c,
                      author=u)
             db.session.add(p)
             db.session.commit()
@@ -445,4 +450,103 @@ class Comment(db.Model):
             raise ValidationError('comment does not have a body')
         return Comment(body=body)
 
+    @staticmethod
+    def generate_fake(count=100):
+        '''生成虚拟文章评论'''
+        from random import seed, randint
+        import forgery_py
+
+        seed()
+        user_count = User.query.count()  # 用户总数
+        post_count = Post.query.count()  # 文章总数
+        for i in range(count):
+            u = User.query.offset(randint(0, user_count-1)).first()  # 随机选择用户
+            p = Post.query.offset(randint(0, post_count-1)).first()  # 随机选择文章
+            c = Comment(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
+                        timestamp=forgery_py.date.date(True),
+                        author=u,
+                        post=p)
+            db.session.add(c)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)  # 定义事件, 修改 body 时, 渲染 md
+
+
+# 由于不需要记录额外信息, 这里使用关联表(非模型类), SQLAlchemy 会接管该表
+tag_relationship = db.Table('tag_relationship',
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True))
+
+
+class Tag(db.Model):
+    '''tags表模型'''
+    __tablename__ = 'tags'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, index=True)
+    posts = db.relationship('Post', secondary=tag_relationship,
+                            backref=db.backref('tags', lazy='dynamic'),
+                            lazy='dynamic')
+
+    def is_tag(self, post):
+        '''判断文章是否包含该标签'''
+        return self.posts.filter_by(id=post.id).first() is not None
+
+    @staticmethod
+    def process_tag(post, tag_data):
+        '''处理标记'''
+        tags = re.split(',\s*|\s+', tag_data.lower())
+        for tag in tags:
+            t = Tag.query.filter_by(name=tag).first()
+            if t is None:  # tag不存在
+                t = Tag(name=tag)
+                t.posts.append(post)
+            if not t.is_tag(post):  # 未标记
+                t.posts.append(post)
+            db.session.add(t)
+        for pt in post.tags.all():
+            if pt.name not in tags:  # 原tag不在列表中, 删除
+                pt.posts.remove(post)
+                db.session.add(pt)
+
+    def tag(self, post):
+        '''标记文章'''
+        if not self.is_tag(post):
+            t = self.posts.append(post)
+            db.session.add(t)
+
+    def untag(self, post):
+        '''取消标记'''
+        if self.is_tag(post):
+            t = self.posts.remove(post)
+            db.session.add(t)
+
+    def __repr__(self):
+        return '<Tag %r>' % self.name
+
+
+class Category(db.Model):
+    '''categories表模型'''
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, index=True)
+    posts = db.relationship('Post', backref='category', lazy='dynamic')
+
+    @staticmethod
+    def insert_category():
+        '''插入默认分类'''
+        cates = ['Python', 'JavaScript', 'CentOS', 'Fedora', 'MySQL', 'Redis']
+        for i in cates:
+            category = Category.query.filter_by(name=i).first()
+            if category is None:
+                category = Category(name=i)
+            db.session.add(category)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+    def __repr__(self):
+        return '<Category %r>' % self.name

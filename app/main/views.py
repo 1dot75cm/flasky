@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
 from .. import db
-from ..models import Permission, Role, User, Post, Comment
+from ..models import Permission, Role, User, Post, Comment, Tag, Category
 from ..decorators import admin_required, permission_required
 
 
@@ -15,12 +15,15 @@ def index():
     form = PostForm()
     if current_user.can(Permission.WRITE_ARTICLES) and \
             form.validate_on_submit():  # 验证用户权限和表单
+        category = Category.query.filter_by(id=form.category.data).first()
         post = Post(title=form.title.data,
+                    category=category,
                     body=form.body.data,
                     author=current_user._get_current_object())
                     # 使用 _get_current_object() 返回数据库需要的实际用户对象
                     # 更新 body 字段后, 会自动调用 on_changed_body 渲染 HTML
         db.session.add(post)
+        Tag.process_tag(post, form.tag.data)
         flash('Your article has been updated.')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)  # 默认第一页
@@ -134,11 +137,15 @@ def edit(id):
     form = PostForm()
     if form.validate_on_submit():
         post.title = form.title.data
+        post.category = Category.query.get(form.category.data)
         post.body = form.body.data
         db.session.add(post)
+        Tag.process_tag(post, form.tag.data)
         flash('The post has been updated.')
         return redirect(url_for('.post', id=post.id))
     form.title.data = post.title
+    form.tag.data = ', '.join([tag.name for tag in post.tags.all()])
+    form.category.data = post.category_id
     form.body.data = post.body
     return render_template('edit_post.html', form=form)
 
@@ -267,3 +274,41 @@ def moderate_disable(id):
     db.session.add(comment)
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+
+
+@main.route('/tags')
+@main.route('/tags/<int:id>')
+def get_tag(id=None):
+    '''标签相关文章'''
+    tags = Tag.query.all()
+    tag = Tag.query.filter_by(id=id).first()
+    if tag is None:
+        query = Post.query
+    else:
+        query = tag.posts
+    page = request.args.get('page', 1, type=int)
+    pagination = query.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pagination.items
+    return render_template('tags.html', tag=tag, tags=tags,
+                           posts=posts, pagination=pagination)
+
+
+@main.route('/categories')
+@main.route('/categories/<int:id>')
+def get_category(id=None):
+    '''分类相关文章'''
+    categories = Category.query.all()
+    category = Category.query.filter_by(id=id).first()
+    if category is None:
+        query = Post.query
+    else:
+        query = category.posts
+    page = request.args.get('page', 1, type=int)
+    pagination = query.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pagination.items
+    return render_template('categories.html', category=category, categories=categories,
+                           posts=posts, pagination=pagination)

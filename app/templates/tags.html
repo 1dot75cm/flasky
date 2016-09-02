@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Flasky - Tags{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-8">
+
+    <h4>Tags</h4>
+{% for tag in tags %}
+    <a href="{{ url_for('.get_tag', id=tag.id) }}">
+        <span class="label label-info tag-size">{{ tag.name }}</span>
+    </a>
+{% endfor %}
+    <hr />
+{% if tag %}
+    <h4>Articles with {{ tag.name }} tag</h4>
+{% else %}
+    <h4>Articles</h4>
+{% endif %}
+
+{% include '_posts.html' %}
+
+{% if pagination %}
+    <div class="pagination">
+    {% if tag %}
+        {{ macros.pagination_widget(pagination, '.get_tag', id=tag.id) }}
+    {% else %}
+        {{ macros.pagination_widget(pagination, '.get_tag') }}
+    {% endif %}
+    </div>
+{% endif %}
+
+    </div>
+</div>
+{% endblock %}

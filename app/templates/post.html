@@ -5,19 +5,29 @@
 {% block title %}Flasky - Post{% endblock %}
 
 {% block page_content %}
+<div class="row">
+    <div class="col-md-8">
+
+{% set show_body = True %}
 {% include '_posts.html' %}
-<h4 id="comments">Comments</h4>
+    <h4 id="comments">Comments</h4>
+
 {% if current_user.can(Permission.COMMENT) %}
-<div class="comment-form">
-    {{ wtf.quick_form(form) }}
-</div>
+    <div class="comment-form">
+        {{ wtf.quick_form(form) }}
+    </div>
 {% else %}
-<p>You need to <a href="{{ url_for('auth.login', next=url_for('.post', id=posts[0].id)) }}">click here</a> to login for post comment.</p>
+    <p>You need to <a href="{{ url_for('auth.login', next=url_for('.post', id=posts[0].id)) }}">click here</a> to login for post comment.</p>
 {% endif %}
+
 {% include '_comments.html' %}
+
 {% if pagination %}
-<div class="pagination">
+    <div class="pagination">
     {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=posts[0].id) }}
-</div>
+    </div>
 {% endif %}
+
+    </div>
+</div>
 {% endblock %}

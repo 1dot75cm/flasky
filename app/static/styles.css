@@ -11,6 +11,10 @@ div.post-tabs {
     margin-top: 16px;
 }
 
+div.post-tabs ul {
+    border-bottom: 0px;
+}
+
 div.post-tabs ul.posts {
     margin: 0px;
     border-top: none;
@@ -20,33 +24,33 @@ ul.posts {
     list-style-type: none;
     padding: 0px;
     margin: 16px 0px 0px 0px;
-    border-top: 1px solid #e0e0e0;
 }
 
 ul.posts li.post {
-    padding: 8px;
-    border-bottom: 1px solid #e0e0e0;
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 15px;
 }
 
 ul.posts li.post:hover {
-    background-color: #f0f0f0;
+    border-color: #d6d6d6;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-div.post-date {
-    float: right;
+div.post-title {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+div.post-header > div {
+    float: left;
+    margin-right: 1em;
 }
 
 div.post-author {
     font-weight: bold;
-}
-
-div.post-thumbnail {
-    position: absolute;
-}
-
-div.post-content {
-    margin-left: 48px;
-    min-height: 48px;
 }
 
 div.post-footer {
@@ -95,8 +99,7 @@ div.comment-form {
 }
 
 div.pagination {
-    width: 100%;
-    text-align: right;
+    text-align: center;
     padding: 0px;
     margin: 0px;
 }
@@ -129,6 +132,11 @@ div.flask-pagedown-preview h3 {
 
 .post-body h3 {
     font-size: 120%;
+}
+
+.tag-size {
+    font-size: 14px;
+    margin-right: 0.5em;
 }
 
 textarea {
