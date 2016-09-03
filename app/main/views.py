@@ -106,6 +106,7 @@ def edit_profile_admin(id):
 def post(id):
     '''文章页视图函数'''
     post = Post.query.get_or_404(id)
+    post.add_view()
     form = CommentForm()
     if form.validate_on_submit():
         comment = Comment(body=form.body.data,

@@ -338,6 +338,7 @@ class Post(db.Model):
     # backref 向 Comment 模型添加 post 属性, 从而定义反向关系
     # post 属性可代替 post_id 引用 Post 模型, 获取与 post 相关的 Comment 模型对象
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    num_of_view = db.Column(db.Integer, default=0)
 
     @staticmethod
     def generate_fake(count=100):
@@ -354,6 +355,7 @@ class Post(db.Model):
             p = Post(title=forgery_py.lorem_ipsum.title(),
                      body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
                      timestamp=forgery_py.date.date(True),
+                     num_of_view=randint(100, 15000),
                      category=c,
                      author=u)
             db.session.add(p)
@@ -398,6 +400,13 @@ class Post(db.Model):
         if body is None or body == '':
             raise ValidationError('post does not have a body')
         return Post(title=title, body=body)
+
+    def add_view(self):
+        '''记录文章访问量'''
+        if self.num_of_view is None:
+            self.num_of_view = 0
+        self.num_of_view += 1
+        db.session.add(self)
 
     def __repr__(self):
         return '<Post %r>' % self.title

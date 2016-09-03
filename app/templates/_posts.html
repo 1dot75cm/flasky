@@ -34,6 +34,9 @@
                     <span class="label label-danger">Edit [Admin]</span>
                 </a>
                 {% endif %}
+                <a href="#">
+                    <span class="label label-primary">{{ post.num_of_view }} Views</span>
+                </a>
                 <a href="{{ url_for('.post', id=post.id) }}#comments">
                     <span class="label label-success">{{ post.comments.count() }} Comments</span>
                 </a>
