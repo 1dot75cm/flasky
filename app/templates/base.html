@@ -59,16 +59,32 @@
 
 {% block content %}
 <div class="container">
-    <!-- 使用 get_flashed_messages() 函数获取并渲染消息 -->
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message }}
-    </div>
-    {% endfor %}
-
-    {% block page_content %}{% endblock %}
-</div>
+    <div class="row">
+        <div class="col-md-8">
+            <!-- 使用 get_flashed_messages() 函数获取并渲染消息 -->
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+            <div class="alert alert-{{ category }}">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% block page_content %}
+            {% endblock %}
+        </div>  <!-- /article -->
+        <div class="col-md-4">
+            {% block page_plugin %}
+                <div class="entry-box">
+                    <h5><strong>博客统计</strong></h5>
+                    <p>访问量：<span class="badge">{{ BlogView.query.count() }}</span></p>
+                    <p>
+                        博文总数：<span class="badge">{{ Post.query.count() }}</span>
+                        评论总数：<span class="badge">{{ Comment.query.count() }}</span>
+                    </p>
+                </div>
+            {% endblock %}
+        </div>  <!-- /plugin -->
+    </div>  <!-- /row -->
+</div>  <!-- /container -->
 <footer id="footer">
     Copyright &copy; 2014-2016 <a href="{{ url_for('main.index') }}">Flasky</a>. Powered by
     <a target="_blank" href="//github.com/1dot75cm/flasky">Flasky</a>,

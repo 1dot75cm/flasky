@@ -2,7 +2,8 @@
 # coding: utf-8
 import os
 from app import create_app, db
-from app.models import User, Follow, Role, Permission, Post, Comment, Tag, Category
+from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
+    Category, BlogView
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -14,11 +15,19 @@ migrate = Migrate(app, db, render_as_batch=is_sqlite)
 # https://github.com/miguelgrinberg/Flask-Migrate/issues/61#issuecomment-208131722
 
 
+# Global variables to jinja2 environment:
+app.jinja_env.globals['Post'] = Post
+app.jinja_env.globals['Comment'] = Comment
+app.jinja_env.globals['Tag'] = Tag
+app.jinja_env.globals['Category'] = Category
+app.jinja_env.globals['BlogView'] = BlogView
+
+
 def make_shell_context():
     '''定义向Shell导入的对象'''
     return dict(app=app, db=db, User=User, Follow=Follow, Role=Role,
                 Permission=Permission, Post=Post, Comment=Comment,
-                Tag=Tag, Category=Category)
+                Tag=Tag, Category=Category, BlogView=BlogView)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 

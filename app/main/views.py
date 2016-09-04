@@ -5,8 +5,14 @@ from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
 from .. import db
-from ..models import Permission, Role, User, Post, Comment, Tag, Category
+from ..models import Permission, Role, User, Post, Comment, Tag, Category, BlogView
 from ..decorators import admin_required, permission_required
+
+
+@main.before_app_request
+def before_request():
+    '''记录访问信息'''
+    BlogView.add_view()
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -47,6 +53,7 @@ def index():
 def user(username):
     '''用户页视图函数'''
     user = User.query.filter_by(username=username).first_or_404()
+    user.add_view()
     page = request.args.get('page', 1, type=int)
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],

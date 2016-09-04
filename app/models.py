@@ -2,12 +2,13 @@
 import re
 import hashlib
 import bleach
+import time
 from datetime import datetime
 from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request, url_for
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin, current_user
 from app.exceptions import ValidationError
 from . import db, login_manager
 
@@ -80,6 +81,7 @@ class User(db.Model, UserMixin):
     about_me = db.Column(db.Text())  # 自我介绍
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)  # 注册日期
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)  # 最后访问日期
+    num_of_view = db.Column(db.Integer, default=0)  # 用户页访问量
     avatar_hash = db.Column(db.String(32))  # 头像hash
     posts = db.relationship('Post', backref='author', lazy='dynamic')  # 返回与用户关联的文章列表
     # backref 向 Post 模型添加 author 属性, 从而定义反向关系
@@ -302,6 +304,13 @@ class User(db.Model, UserMixin):
             'post_count': self.posts.count()
         }
         return json_user
+
+    def add_view(self):
+        '''记录用户页访问量'''
+        if self.num_of_view is None:
+            self.num_of_view = 0
+        self.num_of_view += 1
+        db.session.add(self)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -559,3 +568,40 @@ class Category(db.Model):
 
     def __repr__(self):
         return '<Category %r>' % self.name
+
+
+class BlogView(db.Model):
+    '''blog pv访问统计'''
+    __tablename__ = 'blog_view'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, default=None)
+    user_agent = db.Column(db.Text())
+    ip_addr = db.Column(db.String(15))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    page = db.Column(db.String(128))
+
+    @staticmethod
+    def add_view():
+        '''记录 Blog 日访问量'''
+        if request.path.find('static') == -1:  # 过滤请求
+            pages = []
+            today = time.mktime(datetime.utcnow().date().timetuple())
+            pvs = BlogView.query.order_by(BlogView.timestamp.desc())\
+                .filter_by(ip_addr=request.remote_addr).all()
+            for pv in pvs:
+                ts = time.mktime(pv.timestamp.timetuple())
+                if ts > today:
+                    pages.append(pv.page)
+                else:
+                    break
+            # 不记录同一用户对页面的重复请求
+            if request.path not in pages:
+                if current_user.is_authenticated:
+                    user_id = current_user.id
+                else:
+                    user_id = None
+                pv = BlogView(user_id=user_id,
+                              user_agent=request.user_agent.string,
+                              ip_addr=request.remote_addr,
+                              page=request.path)
+                db.session.add(pv)
