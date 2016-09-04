@@ -30,7 +30,7 @@ def index():
                     # 更新 body 字段后, 会自动调用 on_changed_body 渲染 HTML
         db.session.add(post)
         Tag.process_tag(post, form.tag.data)
-        flash('Your article has been updated.')
+        flash('Your article has been updated.', 'success')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)  # 默认第一页
     show_followed = False
@@ -73,7 +73,7 @@ def edit_profile():
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
         db.session.add(current_user)
-        flash('Your profile has been updated.')
+        flash('Your profile has been updated.', 'success')
         return redirect(url_for('.user', username=current_user.username))
     form.name.data = current_user.name
     form.location.data = current_user.location
@@ -97,7 +97,7 @@ def edit_profile_admin(id):
         user.location = form.location.data
         user.about_me = form.about_me.data
         db.session.add(user)
-        flash('The profile has been updated.')
+        flash('The profile has been updated.', 'success')
         return redirect(url_for('.user', username=user.username))
     form.email.data = user.email
     form.username.data = user.username
@@ -120,7 +120,7 @@ def post(id):
                           post=post,
                           author=current_user._get_current_object())
         db.session.add(comment)
-        flash('Your comment has been published.')
+        flash('Your comment has been published.', 'success')
         return redirect(url_for('.post', id=post.id, page=-1))  # -1 请求评论的最后一页
     page = request.args.get('page', 1, type=int)
     if page == -1:
@@ -149,7 +149,7 @@ def edit(id):
         post.body = form.body.data
         db.session.add(post)
         Tag.process_tag(post, form.tag.data)
-        flash('The post has been updated.')
+        flash('The post has been updated.', 'success')
         return redirect(url_for('.post', id=post.id))
     form.title.data = post.title
     form.tag.data = ', '.join([tag.name for tag in post.tags.all()])
@@ -165,13 +165,13 @@ def follow(username):
     '''关注用户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash('Invalid user.', 'danger')
         return redirect(url_for('.index'))
     if current_user.is_following(user):
-        flash('You are already following this user.')
+        flash('You are already following this user.', 'warning')
         return redirect(url_for('.user', username=username))
     current_user.follow(user)
-    flash('You are now following %s.' % username)
+    flash('You are now following %s.' % username, 'success')
     return redirect(url_for('.user', username=username))
 
 
@@ -182,13 +182,13 @@ def unfollow(username):
     '''取消关注用户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash('Invalid user.', 'danger')
         return redirect(url_for('.index'))
     if not current_user.is_following(user):
-        flash('You are not following this user.')
+        flash('You are not following this user.', 'warning')
         return redirect(url_for('.user', username=username))
     current_user.unfollow(user)
-    flash('You are not following %s anymore.' % username)
+    flash('You are not following %s anymore.' % username, 'success')
     return redirect(url_for('.user', username=username))
 
 
@@ -197,7 +197,7 @@ def followers(username):
     '''关注者视图, 关注该用户的账户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash('Invalid user.', 'danger')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followers.paginate(
@@ -215,7 +215,7 @@ def followed_by(username):
     '''被关注者视图, 该用户关注的账户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash('Invalid user.', 'danger')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followed.paginate(
