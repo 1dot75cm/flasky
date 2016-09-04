@@ -40,5 +40,38 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
+@manager.command
+def deploy(deploy_type='product'):
+    '''Deploy project.'''
+    from flask_migrate import upgrade
+    from app.models import Role, User, Category, Post, Comment
+
+    # upgrade database to the latest version
+    upgrade()
+
+    if deploy_type == 'product':
+        # create user roles
+        Role.insert_roles()
+        # create self-follows for all users
+        User.add_self_follows()
+        # insert default category
+        Category.insert_category()
+
+    # run `python manage.py deploy test_data`
+    if deploy_type == 'test_data':
+        # insert admin account
+        User(email='admin@flasky.com',
+             username='admin',
+             password='admin',
+             role=Role.query.get(2),
+             confirmed=True)
+        # generate random users
+        User.generate_fake(50)
+        # generate random articles
+        Post.generate_fake(500)
+        # generate random comments
+        Comment.generate_fake(5000)
+
+
 if __name__ == '__main__':
     manager.run()
