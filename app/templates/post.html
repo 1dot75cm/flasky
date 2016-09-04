@@ -5,12 +5,12 @@
 {% block title %}Flasky - Post{% endblock %}
 
 {% block page_content %}
-<div class="row">
-    <div class="col-md-8">
-
 {% set show_body = True %}
 {% include '_posts.html' %}
-    <h4 id="comments">Comments</h4>
+
+<div class="comments-body">
+    <h4 id="comments">
+        <span class="glyphicon glyphicon-comment"></span>Comments</h4>
 
 {% if current_user.can(Permission.COMMENT) %}
     <div class="comment-form">
@@ -27,7 +27,5 @@
     {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=posts[0].id) }}
     </div>
 {% endif %}
-
-    </div>
 </div>
 {% endblock %}

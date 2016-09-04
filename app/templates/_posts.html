@@ -15,9 +15,11 @@
                     <a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a>
                 </div>
                 <!-- 日期 -->
-                <div class="post-date">{{ moment(post.timestamp).fromNow() }}</div>
+                <div class="post-date">
+                    <time class="label label-default">{{ moment(post.timestamp).format('YYYY/MM/DD HH:mm') }}</time>
+                </div>
                 <!-- 分类 -->
-                <div>Category:
+                <div>
                 <a href="{{ url_for('.get_category', id=post.category.id) }}">
                     <span class="label label-info">{{ post.category.name }}</span>
                 </a>
@@ -27,11 +29,15 @@
             <div class="post-footer">
                 {% if current_user == post.author %}
                 <a href="{{ url_for('.edit', id=post.id) }}">
-                    <span class="label label-primary">Edit</span>
+                    <span class="label label-primary">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        Edit</span>
                 </a>
                 {% elif current_user.is_administrator() %}
                 <a href="{{ url_for('.edit', id=post.id) }}">
-                    <span class="label label-danger">Edit [Admin]</span>
+                    <span class="label label-danger">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        Edit [Admin]</span>
                 </a>
                 {% endif %}
                 <a href="#">

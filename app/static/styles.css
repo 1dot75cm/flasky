@@ -1,3 +1,31 @@
+body {
+    background: url("background.jpg") repeat scroll 0 0;
+}
+
+.page-header {
+    background-color: white;
+    padding: 15px;
+    margin-top: 0px;
+}
+
+.page-form {
+    background-color: white;
+    padding: 15px;
+}
+
+.entry-box {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.entry-box:hover {
+    border-color: #d6d6d6;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
 .profile-thumbnail {
     position: absolute;
 }
@@ -46,7 +74,7 @@ div.post-title {
 
 div.post-header > div {
     float: left;
-    margin-right: 1em;
+    margin-right: 0.5em;
 }
 
 div.post-author {
@@ -55,6 +83,11 @@ div.post-author {
 
 div.post-footer {
     text-align: right;
+}
+
+.comments-body {
+    background-color: white;
+    padding: 15px;
 }
 
 ul.comments {
@@ -155,4 +188,5 @@ textarea {
     margin-top: 10px;
     text-align: center;
     color: #555;
+    background-color: #e2e2e2;
 }

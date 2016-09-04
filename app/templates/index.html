@@ -5,17 +5,13 @@
 {% block title %}Flasky{% endblock %}
 
 {% block page_content %}
-<div class="row">
-<div class="page-header col-md-8">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
-</div>
-<div class="col-md-8">
-    <!-- 如果用户所属角色没有 WRITE_ARTICLES 权限, 则不显示文章表单 -->
-    {% if current_user.can(Permission.WRITE_ARTICLES) %}
+<!-- 如果用户所属角色没有 WRITE_ARTICLES 权限, 则不显示文章表单 -->
+{% if current_user.can(Permission.WRITE_ARTICLES) %}
+    <div class="page-form">
     {{ wtf.quick_form(form) }}
-    {% endif %}
-</div>
-<div class="post-tabs col-md-8">
+    </div>
+{% endif %}
+<div class="post-tabs">
     <ul class="nav nav-tabs">
         <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>
         {% if current_user.is_authenticated %}
@@ -25,11 +21,10 @@
     {% include '_posts.html' %}
 </div>
 {% if pagination %}
-<div class="pagination col-md-8">
+<div class="pagination">
     {{ macros.pagination_widget(pagination, '.index') }}
 </div>
 {% endif %}
-</div>
 {% endblock %}
 
 {% block scripts %}
