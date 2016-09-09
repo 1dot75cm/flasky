@@ -2,6 +2,32 @@
 <ul class="posts">
     {% for post in posts %}
     <li class="post">
+        {% if current_user.is_authenticated %}
+        <div class="post-control">
+            {% if current_user == post.author %}
+            <a href="{{ url_for('.edit', id=post.id) }}">
+                <span class="label label-primary">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    Edit</span>
+            </a>
+            {% elif current_user.is_administrator() %}
+            <a href="{{ url_for('.edit', id=post.id) }}">
+                <span class="label label-danger">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    Edit [Admin]</span>
+            </a>
+            {% endif %}
+            {% if current_user.is_favorite(post) %}
+            <a href="{{ url_for('.del_favorite', id=post.id) }}">
+                <span class="label label-danger">unfavorite</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('.add_favorite', id=post.id) }}">
+                <span class="label label-success">favorite</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
         <div class="post-title">
             <h3><a href="{{ url_for('.post', id=post.id) }}">{{ post.title }}</a></h3>
         </div>
@@ -27,21 +53,11 @@
             </div>
 
             <div class="post-footer">
-                {% if current_user == post.author %}
-                <a href="{{ url_for('.edit', id=post.id) }}">
-                    <span class="label label-primary">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                        Edit</span>
-                </a>
-                {% elif current_user.is_administrator() %}
-                <a href="{{ url_for('.edit', id=post.id) }}">
-                    <span class="label label-danger">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                        Edit [Admin]</span>
-                </a>
-                {% endif %}
                 <a href="#">
                     <span class="label label-primary">{{ post.num_of_view }} Views</span>
+                </a>
+                <a href="{{ url_for('.get_favorite_users', id=post.id) }}">
+                    <span class="label label-default">{{ post.favorite_users.count() }} Favorites</span>
                 </a>
                 <a href="{{ url_for('.post', id=post.id) }}#comments">
                     <span class="label label-success">{{ post.comments.count() }} Comments</span>

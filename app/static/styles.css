@@ -67,6 +67,10 @@ ul.posts li.post:hover {
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+div.post-control {
+    text-align: right;
+}
+
 div.post-title {
     margin-bottom: 10px;
     text-align: center;

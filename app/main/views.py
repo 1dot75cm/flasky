@@ -63,6 +63,19 @@ def user(username):
                            pagination=pagination)
 
 
+@main.route('/user/<username>/favorites')
+def get_favorite_posts(username):
+    '''用户收藏页视图'''
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    pagination = user.favorite_posts.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pagination.items
+    return render_template('favorite_posts.html', user=user, posts=posts,
+                           pagination=pagination)
+
+
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
@@ -320,3 +333,48 @@ def get_category(id=None):
     posts = pagination.items
     return render_template('categories.html', category=category, categories=categories,
                            posts=posts, pagination=pagination)
+
+
+@main.route('/favorites/<int:id>')
+def get_favorite_users(id):
+    '''收藏文章的用户'''
+    post = Post.query.filter_by(id=id).first()
+    page = request.args.get('page', 1, type=int)
+    pagination = post.favorite_users.order_by(User.username.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    users = pagination.items
+    return render_template('favorite_users.html', users=users, post=post,
+                           pagination=pagination)
+
+
+@main.route('/favorites/<int:id>/follow')
+@login_required
+def add_favorite(id):
+    '''收藏文章'''
+    post = Post.query.filter_by(id=id).first()
+    if post is None:
+        flash('Invalid post.', 'danger')
+        return redirect(url_for('.index'))
+    if current_user.is_favorite(post):
+        flash('You are already favorite this post.', 'warning')
+        return redirect(url_for('.user', username=current_user.username))
+    current_user.add_favorite(post)
+    flash('You are now favorite <%s>.' % post.title, 'success')
+    return redirect(url_for('.user', username=current_user.username))
+
+
+@main.route('/favorites/<int:id>/unfollow')
+@login_required
+def del_favorite(id):
+    '''取消收藏'''
+    post = Post.query.filter_by(id=id).first()
+    if post is None:
+        flash('Invalid post.', 'danger')
+        return redirect(url_for('.index'))
+    if not current_user.is_favorite(post):
+        flash('You are not favorite this post.', 'warning')
+        return redirect(url_for('.user', username=current_user.username))
+    current_user.del_favorite(post)
+    flash('You are not favorite <%s> anymore.' % post.title, 'success')
+    return redirect(url_for('.user', username=current_user.username))

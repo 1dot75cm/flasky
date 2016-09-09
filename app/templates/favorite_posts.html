@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Flasky - {{ user.username }}'s favorites{% endblock %}
+
+{% block page_content %}
+{% if current_user.username == user.username %}
+<h3>My favorites</h3>
+{% else %}
+<h3>Favorited by {{ user.username }}</h3>
+{% endif %}
+
+{% include '_posts.html' %}
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.get_favorite_posts', username=user.username) }}
+</div>
+{% endif %}
+{% endblock %}

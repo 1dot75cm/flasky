@@ -108,7 +108,7 @@ class User(db.Model, UserMixin):
     def generate_fake(count=100):
         '''生成虚拟用户数据'''
         from sqlalchemy.exc import IntegrityError
-        from random import seed
+        from random import seed, randint
         import forgery_py
 
         seed()
@@ -121,6 +121,10 @@ class User(db.Model, UserMixin):
                      location=forgery_py.address.city(),
                      about_me=forgery_py.lorem_ipsum.sentence(),
                      member_since=forgery_py.date.date(True))
+            if i > 1:
+                ufs = User.query.offset(randint(0, i)).all()
+                for uf in ufs[0: randint(0, len(ufs))]:
+                    u.follow(uf)
             db.session.add(u)
             try:
                 db.session.commit()
@@ -312,6 +316,23 @@ class User(db.Model, UserMixin):
         self.num_of_view += 1
         db.session.add(self)
 
+    def add_favorite(self, post):
+        '''收藏文章'''
+        if not self.is_favorite(post):
+            self.favorite_posts.append(post)
+            db.session.add(self)
+
+    def del_favorite(self, post):
+        '''取消收藏'''
+        if self.is_favorite(post):
+            self.favorite_posts.remove(post)
+            db.session.add(self)
+
+    def is_favorite(self, post):
+        '''判断是否收藏文章'''
+        return self.favorite_posts.filter_by(
+            id=post.id).first() is not None
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -334,6 +355,11 @@ def load_user(user_id):
     return User.query.get(int(user_id))  # 返回用户对象或 None
 
 
+favorite_relationship = db.Table('favorite_relationship',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
+
+
 class Post(db.Model):
     '''posts表模型'''
     __tablename__ = 'posts'
@@ -348,6 +374,9 @@ class Post(db.Model):
     # post 属性可代替 post_id 引用 Post 模型, 获取与 post 相关的 Comment 模型对象
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     num_of_view = db.Column(db.Integer, default=0)
+    favorite_users = db.relationship('User', secondary=favorite_relationship,
+                        backref=db.backref('favorite_posts', lazy='dynamic'),
+                        lazy='dynamic')
 
     @staticmethod
     def generate_fake(count=100):
@@ -367,7 +396,11 @@ class Post(db.Model):
                      num_of_view=randint(100, 15000),
                      category=c,
                      author=u)
-            db.session.add(p)
+            if i > 1:
+                pfs = Post.query.offset(randint(0, i)).all()  # 随机选择文章
+                for pf in pfs[0: randint(0, len(pfs))]:
+                    u.add_favorite(pf)
+            db.session.add_all([p, u])
             db.session.commit()
 
     @staticmethod
