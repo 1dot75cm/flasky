@@ -103,6 +103,9 @@ class User(db.Model, UserMixin):
     comments = db.relationship('Comment', backref='author', lazy='dynamic')  # 返回与用户关联的评论列表
     # backref 向 Comment 模型添加 author 属性, 从而定义反向关系
     # author 属性可代替 author_id 引用 User 模型, 获取与 author 相关的 Comment 模型对象
+    oauth = db.relationship('OAuth', backref='local', uselist=False)
+    # backref 向 OAuth 模型添加 local 属性, 从而定义反向关系
+    # local 属性可代替 local_uid 引用 User 模型, 获取与 local 相关的 OAuth 模型对象
 
     @staticmethod
     def generate_fake(count=100):
@@ -638,3 +641,40 @@ class BlogView(db.Model):
                               ip_addr=request.remote_addr,
                               page=request.path)
                 db.session.add(pv)
+
+    def __repr__(self):
+        return '<BlogView %r>' % self.id
+
+
+class OAuth(db.Model):
+    '''oauth表模型'''
+    __tablename__ = 'oauth'
+    id = db.Column(db.Integer, primary_key=True)
+    type_id = db.Column(db.Integer, db.ForeignKey('oauth_type.id'))
+    local_uid = db.Column(db.Integer, db.ForeignKey('users.id'))
+    remote_uid = db.Column(db.Integer)
+    access_token = db.Column(db.String(400), unique=True, default='')
+
+    def __repr__(self):
+        return '<OAuth %r>' % self.remote_uid
+
+
+class OAuthType(db.Model):
+    '''oauth_type表模型'''
+    __tablename__ = 'oauth_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    oauths = db.relationship('OAuth', backref='type', lazy='dynamic')
+
+    @staticmethod
+    def insert_oauth():
+        '''插入OAuth类型'''
+        oauths = ['github']
+        for i in oauths:
+            oauth = OAuthType.query.filter_by(name=i).first()
+            if oauth is None:
+                oauth = OAuthType(name=i)
+            db.session.add(oauth)
+
+    def __repr__(self):
+        return '<OAuthType %r>' % self.name

@@ -7,8 +7,10 @@
 {% block page_content %}
 <!-- 如果用户所属角色没有 WRITE_ARTICLES 权限, 则不显示文章表单 -->
 {% if current_user.can(Permission.WRITE_ARTICLES) %}
-    <div class="page-form">
-    {{ wtf.quick_form(form) }}
+    <div class="page-content">
+        <div class="page-form">
+        {{ wtf.quick_form(form) }}
+        </div>
     </div>
 {% endif %}
 <div class="post-tabs">

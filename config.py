@@ -28,6 +28,18 @@ class Config:
     # take a reference to the book <<Flask Framework Cookbook>>.
     # But the book only have the version of English.
 
+    # GitHub OAuth2
+    GITHUB = dict(
+        consumer_key = os.getenv('GITHUB_ID'),
+        consumer_secret = os.getenv('GITHUB_SECRET'),
+        base_url = 'https://api.github.com/',
+        request_token_url = None,
+        request_token_params = {'scope': 'user:email'},
+        access_token_method = 'POST',
+        access_token_url = 'https://github.com/login/oauth/access_token',
+        authorize_url = 'https://github.com/login/oauth/authorize'
+    )
+
     @staticmethod
     def init_app(app):
         '''初始化app'''

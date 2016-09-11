@@ -8,9 +8,14 @@ body {
     margin-top: 0px;
 }
 
-.page-form {
+.page-content {
     background-color: white;
     padding: 15px;
+}
+
+.page-form {
+    margin: 0 auto;
+    max-width: 400px;
 }
 
 .entry-box {
@@ -33,6 +38,24 @@ body {
 .profile-header {
     min-height: 260px;
     margin-left: 280px;
+}
+
+ul.oauth {
+    list-style-type: none;
+    padding: 0px;
+    margin: 16px 0px 0px 0px;
+    height: 40px;
+}
+
+ul.oauth li {
+    float: left;
+    padding: 2px;
+    margin-right: 12px;
+}
+
+ul.oauth li:hover {
+    border-color: #d6d6d6;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 div.post-tabs {

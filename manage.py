@@ -3,7 +3,7 @@
 import os
 from app import create_app, db
 from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
-    Category, BlogView
+    Category, BlogView, OAuth, OAuthType
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -27,7 +27,8 @@ def make_shell_context():
     '''定义向Shell导入的对象'''
     return dict(app=app, db=db, User=User, Follow=Follow, Role=Role,
                 Permission=Permission, Post=Post, Comment=Comment,
-                Tag=Tag, Category=Category, BlogView=BlogView)
+                Tag=Tag, Category=Category, BlogView=BlogView, OAuth=OAuth,
+                OAuthType=OAuthType)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 
@@ -56,6 +57,8 @@ def deploy(deploy_type='product'):
         User.add_self_follows()
         # insert default category
         Category.insert_category()
+        # insert default oauth
+        OAuthType.insert_oauth()
 
     # run `python manage.py deploy test_data`
     if deploy_type == 'test_data':
