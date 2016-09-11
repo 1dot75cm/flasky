@@ -40,6 +40,10 @@ class Config:
         authorize_url = 'https://github.com/login/oauth/authorize'
     )
 
+    # Fedora FAS OpenID
+    FAS_OPENID_ENDPOINT = 'https://id.fedoraproject.org/openid/'
+    FAS_OPENID_CHECK_CERT = True
+
     @staticmethod
     def init_app(app):
         '''初始化app'''

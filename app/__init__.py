@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_oauthlib.client import OAuth
+from flask_fas_openid import FAS
 from sqlalchemy import MetaData
 from config import config
 
@@ -26,6 +27,7 @@ moment = Moment()
 db = SQLAlchemy(metadata=metadata)
 pagedown = PageDown()
 oauth = OAuth()
+fas = FAS(Flask(__name__))
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'  # 会话安全等级
@@ -47,6 +49,7 @@ def create_app(config_name):
     login_manager.init_app(app)
     pagedown.init_app(app)
     oauth.init_app(app)
+    fas.__init__(app)
 
     # 附加路由和错误页面, 在蓝图中定义
     from .main import main as main_blueprint

@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('type_id', sa.Integer(), nullable=True),
     sa.Column('local_uid', sa.Integer(), nullable=True),
-    sa.Column('remote_uid', sa.Integer(), nullable=True),
+    sa.Column('remote_uid', sa.String(length=50), nullable=True),
     sa.Column('access_token', sa.String(length=400), nullable=True),
     sa.ForeignKeyConstraint(['local_uid'], ['users.id'], name=op.f('fk_oauth_local_uid_users')),
     sa.ForeignKeyConstraint(['type_id'], ['oauth_type.id'], name=op.f('fk_oauth_type_id_oauth_type')),

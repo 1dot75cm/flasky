@@ -12,3 +12,7 @@ Flask-OAuthlib==0.9.3
 Flask-PageDown==0.2.1
 Markdown==2.6.6
 bleach==1.4.3
+python-fedora==0.8.0
+python-openid==2.2.5
+python-openid-cla==1.2
+python-openid-teams==1.1

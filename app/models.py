@@ -652,7 +652,7 @@ class OAuth(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type_id = db.Column(db.Integer, db.ForeignKey('oauth_type.id'))
     local_uid = db.Column(db.Integer, db.ForeignKey('users.id'))
-    remote_uid = db.Column(db.Integer)
+    remote_uid = db.Column(db.String(50))
     access_token = db.Column(db.String(400), unique=True, default='')
 
     def __repr__(self):
@@ -669,7 +669,7 @@ class OAuthType(db.Model):
     @staticmethod
     def insert_oauth():
         '''插入OAuth类型'''
-        oauths = ['github']
+        oauths = ['github', 'fedora']
         for i in oauths:
             oauth = OAuthType.query.filter_by(name=i).first()
             if oauth is None:

@@ -1,8 +1,8 @@
 # coding: utf-8
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, g
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
-from .. import db
+from .. import db, fas
 from ..models import User, OAuthType
 from ..email import send_email
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
@@ -49,6 +49,8 @@ def login():
 def logout():
     '''退出登陆视图'''
     logout_user()  # 删除用户会话
+    if g.fas_user:
+        fas.logout()
     flash('You have been logged out.', 'success')
     return redirect(url_for('main.index'))
 
