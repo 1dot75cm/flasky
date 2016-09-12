@@ -6,6 +6,7 @@ from .. import db, oauth, fas
 from ..models import User, OAuth, OAuthType
 
 github = oauth.remote_app('github', app_key='GITHUB')  # GitHub OAuth2
+google = oauth.remote_app('google', app_key='GOOGLE')  # Google OAuth2
 
 
 @auth.route('/login/oauth')
@@ -15,6 +16,9 @@ def oauth_login():
         return github.authorize(callback=url_for('.oauth_authorized',
             next=request.args.get('next') or request.referrer or None,
             op='github', _external=True))
+    if request.args.get('op') == 'google':
+        return google.authorize(callback=url_for('.oauth_authorized',
+            op='google', _external=True))
     if request.args.get('op') == 'fedora':
         return fas.login(return_url=url_for('.oauth_authorized',
             next=request.args.get('next') or request.referrer or None,
@@ -47,6 +51,40 @@ def oauth_authorized():
             login_user(oauth.local)
             flash('Hello, %s.' % oauth.local.username, 'success')
             return redirect(request.args.get('next') or url_for('main.index'))
+
+    if op == 'google':
+        resp = google.authorized_response()
+        if resp is None:  # 验证失败
+            flash('Access denied: reason=%s error=%s' % (
+                request.args['error'],
+                request.args['error_description']
+            ), 'danger')
+            return redirect(request.args.get('next') or url_for('.login'))
+        if resp.get('access_token'):  # 防刷新
+            get = google.get('userinfo', token=(resp['access_token'], ''))
+            me = json.loads(get.raw_data)
+            oauth = OAuth.query.filter_by(remote_uid=me['id']).first()
+            oauth_type = OAuthType.query.filter_by(name=op).first()
+            if get.status == 200:
+                session['google_id'] = me['id']
+                if oauth is None:  # 从未登陆, 创建新账户
+                    u = User(email=me['email'],
+                             username=me['given_name']+me['id'][-4:],
+                             confirmed=True,
+                             name=me['name'],
+                             about_me='Welcome to use flasky.',
+                             oauth=OAuth(type=oauth_type,
+                                         remote_uid=me['id'],
+                                         access_token=resp['access_token']))
+                    db.session.add(u)
+                    login_user(u)
+                    flash('Hello, %s.' % u.username, 'success')
+                    return redirect(request.args.get('next') or url_for('main.index'))
+                if oauth:  # 再次授权, 更新token
+                    oauth.access_token = resp['access_token']
+                    login_user(oauth.local)
+                    flash('Hello, %s.' % oauth.local.username, 'success')
+                    return redirect(request.args.get('next') or url_for('main.index'))
 
     if op == 'github':
         resp = github.authorized_response()
@@ -91,5 +129,13 @@ def oauth_authorized():
 def get_github_oauth_token(token=None):
     '''读取第三方应用返回的 token'''
     uid = session.get('github_id')
+    oauth = OAuth.query.filter_by(remote_uid=uid).first()
+    return (oauth.access_token, '')
+
+
+@google.tokengetter
+def get_google_oauth_token():
+    '''读取 Google token'''
+    uid = session.get('google_id')
     oauth = OAuth.query.filter_by(remote_uid=uid).first()
     return (oauth.access_token, '')

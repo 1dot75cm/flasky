@@ -40,6 +40,18 @@ class Config:
         authorize_url = 'https://github.com/login/oauth/authorize'
     )
 
+    # Google OAuth2
+    GOOGLE = dict(
+        consumer_key = os.getenv('GOOGLE_ID'),
+        consumer_secret = os.getenv('GOOGLE_SECRET'),
+        base_url='https://www.googleapis.com/oauth2/v2/',
+        request_token_params = {'scope': 'email'},
+        request_token_url = None,
+        access_token_method = 'POST',
+        access_token_url = 'https://accounts.google.com/o/oauth2/token',
+        authorize_url = 'https://accounts.google.com/o/oauth2/auth'
+    )
+
     # Fedora FAS OpenID
     FAS_OPENID_ENDPOINT = 'https://id.fedoraproject.org/openid/'
     FAS_OPENID_CHECK_CERT = True

@@ -669,7 +669,7 @@ class OAuthType(db.Model):
     @staticmethod
     def insert_oauth():
         '''插入OAuth类型'''
-        oauths = ['github', 'fedora']
+        oauths = ['github', 'google', 'fedora']
         for i in oauths:
             oauth = OAuthType.query.filter_by(name=i).first()
             if oauth is None:
