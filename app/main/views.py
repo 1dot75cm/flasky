@@ -5,7 +5,8 @@ from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
 from .. import db
-from ..models import Permission, Role, User, Post, Comment, Tag, Category, BlogView
+from ..models import Permission, Role, User, Post, Comment, Tag, Category,\
+    BlogView, Chrome
 from ..decorators import admin_required, permission_required
 
 
@@ -378,3 +379,29 @@ def del_favorite(id):
     current_user.del_favorite(post)
     flash('You are not favorite <%s> anymore.' % post.title, 'success')
     return redirect(url_for('.user', username=current_user.username))
+
+
+@main.route('/tools/chrome')
+def get_chrome():
+    '''获取chrome版本'''
+    platform = ['win', 'mac', 'linux']
+    archs = ['x86', 'x64']
+    channels = ['stable', 'beta', 'dev', 'canary']
+
+    cache = request.args.get('cache', True)
+    if cache in ['0', 'false']:
+        cache = False
+    system = request.args.get('os', platform)
+    arch = request.args.get('arch', archs)
+    channel = request.args.get('channel', channels)
+
+    tab_type = system if type(system) == unicode else None
+    system = [system] if type(system) == unicode else system
+    arch = [arch] if type(arch) == unicode else arch
+    channel = [channel] if type(channel) == unicode else channel
+
+    if system[0] in platform and arch[0] in archs and channel[0] in channels:
+        pkgs, cache = Chrome.check_update(system, channel, arch, cache)
+        return render_template('chrome.html', pkgs=pkgs, cache=cache, tab=tab_type)
+    else:
+        abort(404)

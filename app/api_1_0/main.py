@@ -12,5 +12,6 @@ def main():
             'token': url_for('.get_token', _external=True),
             'users': url_for('.get_users', _external=True),
             'posts': url_for('.get_posts', _external=True),
-            'comments': url_for('.get_comments', _external=True)}
+            'comments': url_for('.get_comments', _external=True),
+            'chrome': url_for('.get_chrome', _external=True)}
         })

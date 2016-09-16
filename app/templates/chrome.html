@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Flasky - Chrome{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h3>Get Google Chrome versions</h3>
+</div>
+
+<div class="page-content">
+    <p>Query time: {{ moment(pkgs[0].timestamp).format('YYYY/MM/DD hh:mm:ss') }}
+        {% if cache %}
+        <small>(cache)</small>
+        {% endif %}
+    </p>
+    <ul class="nav nav-tabs">
+        <li {% if tab == 'win' %}class='active'{% endif %}><a href="{{ url_for('main.get_chrome', os='win') }}">Windows</a></li>
+        <li {% if tab == 'mac' %}class='active'{% endif %}><a href="{{ url_for('main.get_chrome', os='mac') }}">macOS</a></li>
+        <li {% if tab == 'linux' %}class='active'{% endif %}><a href="{{ url_for('main.get_chrome', os='linux') }}">Linux</a></li>
+    </ul>
+    <table class="table table-hover followers">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>OS</th>
+                <th>Arch</th>
+                <th>Channel</th>
+                <th>Size</th>
+                <th>URLs</th>
+            </tr>
+        </thead>
+        {% for pkg in pkgs %}
+        <tr>
+            <td title="{{ pkg.hash }}">{{ pkg.name }}</td>
+            <td>{{ pkg.version }}</td>
+            <td>{{ pkg.os }}</td>
+            <td>{{ pkg.arch }}</td>
+            <td>{{ pkg.channel }}</td>
+            <td title="{{ pkg.size|filesizeformat() }}">{{ pkg.size }}</td>
+            <td>
+                {% for url in pkg.urls|split(',') %}
+                <a href="{{ url }}">url{{ loop.index }}</a>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

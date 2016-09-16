@@ -10,7 +10,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin, current_user
 from app.exceptions import ValidationError
-from . import db, login_manager
+from . import db, login_manager, chrome
 
 
 class Permission:
@@ -678,3 +678,56 @@ class OAuthType(db.Model):
 
     def __repr__(self):
         return '<OAuthType %r>' % self.name
+
+
+class Chrome(db.Model):
+    '''chrome表模型'''
+    __tablename__ = 'chrome'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    os = db.Column(db.String(5))
+    arch = db.Column(db.String(3))
+    channel = db.Column(db.String(6))
+    version = db.Column(db.String(15))
+    size = db.Column(db.String(10))
+    hash = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    urls = db.Column(db.Text())
+
+    @staticmethod
+    def check_update(system, channel, arch, cache=True, interval=3600):
+        '''检查更新, 返回列表'''
+        pkglist = []
+        p = Chrome.query.order_by(Chrome.timestamp.desc()).first()
+        # 查询数据库, 返回包信息
+        if p is not None and cache:
+            qtime = time.mktime(p.timestamp.timetuple())
+            ctime = time.mktime(time.gmtime())
+            if ctime - qtime < interval:
+                for os in system:
+                    p = Chrome.query.filter_by(os=os).all()
+                    pkglist += p
+                return pkglist, cache
+
+        # 从 Google 获取包信息
+        cache = False
+        pkgs = chrome.get_pkg_info(system, channel, arch)
+        for pkg in pkgs:
+            p = Chrome.query.filter_by(hash=pkg['sha256']).first()
+            if p is None:
+                p = Chrome(name=pkg['name'],
+                           version=pkg['version'],
+                           os=pkg['os'],
+                           arch=pkg['arch'],
+                           channel=pkg['channel'],
+                           size=pkg['size'],
+                           hash=pkg['sha256'],
+                           urls=','.join(pkg['urls']))
+            else:
+                p.timestamp = datetime.utcnow()
+            db.session.add(p)
+            pkglist.append(p)
+        return pkglist, cache
+
+    def __repr__(self):
+        return '<Chrome %r>' % self.name

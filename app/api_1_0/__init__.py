@@ -2,4 +2,4 @@ from flask import Blueprint
 
 api = Blueprint('api', __name__)
 
-from . import authentication, posts, users, comments, errors, main
+from . import authentication, posts, users, comments, errors, main, chrome
