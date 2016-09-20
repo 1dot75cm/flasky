@@ -9,7 +9,8 @@ SERVICE = $(SUDO) $(PREFIX)/systemctl
 install:
 	@echo "Install base environment <--"
 	@$(DNF) install -y mariadb-server mariadb nginx uwsgi \
-		python-virtualenv python-pip python-devel gcc
+		python-virtualenv python-pip python-devel gcc \
+		python2-dnf python-dnf createrepo_c
 
 	@echo "Create virtualenv and install packages <--"
 	@$(VENV) venv; \

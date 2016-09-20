@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Flasky - RPM Update System{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h3>RPM Update System</h3>
+</div>
+
+<div class="page-content">
+    <ul class="nav nav-tabs">
+        {% for release in releases %}
+        <li {% if tab == release.name %}class='active'{% endif %}>
+            <a href="{{ url_for('main.get_rpm_items', release=release.name) }}">{{ release.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <table class="table table-hover followers">
+        <thead>
+            <tr>
+                <th>Update</th>
+                <th>Age</th>
+                <th>Release</th>
+                <th>Karma</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        {% for pkg in pkgs %}
+        <tr>
+            <td><a href="{{ url_for('main.get_rpm_task', id=pkg.task_id)}}">{{ pkg.name }}</a></td>
+            <td><time class="table-date">{{ moment(pkg.timestamp).fromNow(refresh=True) }}</time></td>
+            <td>{{ pkg.release.name }}</td>
+            <td><span class="label label-{% if pkg.karma >= 0 %}success{% else %}danger{% endif %}">
+                {% if pkg.karma > 0 %}+{% endif %}{{ pkg.karma }}</span>
+            </td>
+            <td>
+                {% if pkg.status == 'pending' %}
+                <span class="label label-primary">{{ pkg.status }}</span>
+                {% elif pkg.status == 'testing' %}
+                <span class="label label-warning">{{ pkg.status }}</span>
+                {% elif pkg.status == 'stable' %}
+                <span class="label label-success">{{ pkg.status }}</span>
+                {% elif pkg.status == 'obsolete' %}
+                <span class="label label-default">{{ pkg.status }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% if pagination %}
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, 'main.get_rpm_items', release=tab) }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,5 +1,14 @@
 # coding: utf-8
+import sys
+sys.path.append('/usr/lib/python2.7/site-packages')
+sys.path.append('/usr/lib64/python2.7/site-packages')
+import os
 import re
+import dnf
+import json
+import random
+import string
+import shutil
 import hashlib
 import bleach
 import time
@@ -10,6 +19,8 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin, current_user
 from app.exceptions import ValidationError
+from dnf.exceptions import RepoError
+from commands import getoutput
 from . import db, login_manager, chrome
 
 
@@ -471,6 +482,7 @@ class Comment(db.Model):
     disabled = db.Column(db.Boolean)  # 用于管理员禁用不当言论
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    package_id = db.Column(db.Integer, db.ForeignKey('packages.id'))
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -591,7 +603,7 @@ class Category(db.Model):
     @staticmethod
     def insert_category():
         '''插入默认分类'''
-        cates = ['Python', 'JavaScript', 'CentOS', 'Fedora', 'MySQL', 'Redis']
+        cates = current_app.config['DEFAULT_CATEGORY']
         for i in cates:
             category = Category.query.filter_by(name=i).first()
             if category is None:
@@ -669,7 +681,7 @@ class OAuthType(db.Model):
     @staticmethod
     def insert_oauth():
         '''插入OAuth类型'''
-        oauths = ['github', 'google', 'fedora']
+        oauths = current_app.config['DEFAULT_OAUTHS']
         for i in oauths:
             oauth = OAuthType.query.filter_by(name=i).first()
             if oauth is None:
@@ -731,3 +743,171 @@ class Chrome(db.Model):
 
     def __repr__(self):
         return '<Chrome %r>' % self.name
+
+
+class Package(db.Model):
+    '''packages表模型'''
+    __tablename__ = 'packages'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150))
+    pkgnames = db.Column(db.Text)
+    task_id = db.Column(db.String(100), unique=True)
+    release_id = db.Column(db.Integer, db.ForeignKey('releases.id'))
+    karma = db.Column(db.Integer, default=0)
+    status = db.Column(db.String(10), default='pending')
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    deadline = db.Column(db.Integer, default=3600*24*2)
+    comments = db.relationship('Comment', backref='package', lazy='dynamic')
+
+    @staticmethod
+    def insert_pkgs(pkgs, arch, release):
+        '''插入package'''
+        for pkg in pkgs:
+            pkgname = '%s-%s-%s.%s.rpm' % (pkg.name, pkg.version, pkg.release, pkg.arch)
+            p = Package.query.filter_by(name=pkg.sourcerpm.split('.src.rpm')[0]).first()
+            if p is None:
+                p = Package(
+                    name=pkg.sourcerpm.split('.src.rpm')[0],
+                    pkgnames=json.dumps({'i386':[], 'x86_64':[]}),
+                    task_id=Package.generate_task_id(),
+                    release=Release.query.filter_by(name=release).first(),
+                    deadline=current_app.config['PKG_DEADLINE'])
+            p.add_pkg(arch, pkgname)
+            db.session.add(p)
+        db.session.commit()
+
+    def get_pkg_dict(self):
+        '''返回package字典'''
+        return json.loads(self.pkgnames)
+
+    def add_pkg(self, arch, pkg):
+        '''写入pkg至pkgnames字段'''
+        pkgnames = self.get_pkg_dict()
+        if pkg not in pkgnames[arch]:
+            pkgnames[arch].append(pkg)
+            self.pkgnames = json.dumps(pkgnames)
+
+    @staticmethod
+    def scan_repo():
+        '''扫描 repo 写入数据库'''
+        config = current_app.config
+        for rel in config['DEFAULT_RELEASES']:
+            for arch in config['REPO_ARCH']:
+                reponame = '%s_fc%s_%s' % (
+                    config['REPO_TESTING_DIR'], rel[1:], arch)
+                r = dnf.repo.Repo(id_=reponame, cachedir='/tmp/')
+                r.baseurl = '/'.join([
+                    config['REPO_URL'],
+                    config['REPO_TESTING_DIR'],
+                    rel[1:], arch])
+                try:
+                    r.load()
+                except RepoError:
+                    continue
+
+                b = dnf.Base()
+                b.repos.add(r)
+                b.fill_sack(load_available_repos=True)
+                q = b.sack.query()
+                pkgs = q.filter(reponame=reponame).run()
+                Package.insert_pkgs(pkgs, arch, rel)
+
+    @staticmethod
+    def generate_task_id(length=10):
+        '''生成ID'''
+        return 'Fedora-%s-%s' % (
+            datetime.today().year,
+            ''.join(random.sample(string.ascii_letters+string.digits, length)))
+
+    @staticmethod
+    def create_repo(output):
+        '''Creates metadata of rpm repository'''
+        command = '/bin/createrepo_c -d -x *.src.rpm '
+        if isinstance(output, list):
+            return [getoutput(''.join([command, out])) for out in output]
+        if isinstance(output, str):
+            return getoutput(''.join([command, output]))
+
+    def set_karma(self, data):
+        '''set karma'''
+        if data.find('+1') != -1:
+            self.karma += 1
+        if data.find('-1') != -1:
+            self.karma -= 1
+        self.check_karma()
+        db.session.add(self)
+
+    def check_karma(self):
+        '''check karma'''
+        config = current_app.config
+        qtime = time.mktime(self.timestamp.timetuple())
+        ctime = time.mktime(time.gmtime())
+        if self.status == 'pending':
+            self.to_testing()
+        if self.karma >= config['KARMA_MINI_STABLE'] \
+                and ctime - qtime > self.deadline \
+                and self.status == 'testing':
+            self.to_stable()
+        if self.karma >= config['KARMA_TO_STABLE'] \
+                and self.status == 'testing':
+            self.to_stable()
+        if ctime - qtime > self.deadline and self.status == 'testing':
+            self.to_stable()
+        if self.karma <= config['KARMA_MINI_OBSOLETE'] \
+                and ctime - qtime > self.deadline \
+                and self.status == 'testing':
+            self.to_obsolete()
+        if self.karma <= config['KARMA_TO_OBSOLETE'] \
+                and self.status == 'testing':
+            self.to_obsolete()
+
+    def to_testing(self):
+        '''修改包状态为testing'''
+        self.status = 'testing'
+        db.session.add(self)
+
+    def to_stable(self):
+        '''修改包状态为stable'''
+        self.status = 'stable'
+        pkgs = self.get_pkg_dict()
+        base = current_app.config['REPO_PATH']
+        release = self.release.name[1:]
+        for arch in current_app.config['REPO_ARCH']:
+            spath = os.path.join(base, current_app.config['REPO_TESTING_DIR'], release, arch)
+            tpath = os.path.join(base, current_app.config['REPO_STABLE_DIR'], release, arch)
+            for pkg in pkgs[arch]:
+                source = os.path.join(spath, pkg)
+                target = os.path.join(tpath, pkg)
+                shutil.move(source, target)
+            self.create_repo([spath, tpath])
+        db.session.add(self)
+        return True
+
+    def to_obsolete(self):
+        '''修改包状态为obsolete'''
+        self.status = 'obsolete'
+        db.session.add(self)
+
+    def __repr__(self):
+        return '<Package %r>' % self.name
+
+
+class Release(db.Model):
+    '''releases表模型'''
+    __tablename__ = 'releases'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(10))
+    packages = db.relationship('Package', backref='release', lazy='dynamic')
+
+    @staticmethod
+    def insert_release():
+        '''插入默认Release'''
+        releases = current_app.config['DEFAULT_RELEASES']
+        for release in releases:
+            rel = Release.query.filter_by(name=release).first()
+            if rel is None:
+                rel = Release(name=release)
+            db.session.add(rel)
+
+    def __repr__(self):
+        return '<Release %r>' % self.name

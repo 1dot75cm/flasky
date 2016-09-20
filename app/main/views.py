@@ -6,7 +6,7 @@ from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
 from .. import db
 from ..models import Permission, Role, User, Post, Comment, Tag, Category,\
-    BlogView, Chrome
+    BlogView, Chrome, Package, Release
 from ..decorators import admin_required, permission_required
 
 
@@ -405,3 +405,50 @@ def get_chrome():
         return render_template('chrome.html', pkgs=pkgs, cache=cache, tab=tab_type)
     else:
         abort(404)
+
+
+@main.route('/tools/updates/')
+def get_rpm_items():
+    '''RPM包列表视图'''
+    page = request.args.get('page', 1, type=int)
+    release = request.args.get('release', 'F24')
+    status = request.args.get('status', '')
+
+    releases = Release.query.all()
+    if release:
+        _release = Release.query.filter_by(name=release).first()
+    _query = _release.packages if _release else Package.query
+    query = _query.order_by(Package.timestamp.desc()).filter_by(status=status) \
+        if status else \
+            _query.order_by(Package.timestamp.desc())
+    pagination = query.paginate(
+        page, per_page=current_app.config['FLASKY_PKGS_PER_PAGE'],
+        error_out=False)
+    pkgs = pagination.items
+    return render_template('rpm_items.html', pkgs=pkgs, pagination=pagination,
+                           tab=release, releases=releases)
+
+
+@main.route('/tools/updates/<id>', methods=['GET', 'POST'])
+def get_rpm_task(id):
+    '''RPM包视图'''
+    package = Package.query.filter_by(task_id=id).first_or_404()
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(body=form.body.data,
+                          package=package,
+                          author=current_user._get_current_object())
+        package.set_karma(form.body.data)
+        db.session.add(comment)
+        flash('Your comment has been published.', 'success')
+        return redirect(url_for('.get_rpm_task', id=package.task_id, page=-1))
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = (package.comments.count() - 1) // \
+            current_app.config['FLASKY_COMMENTS_PER_PAGE'] + 1  # 计算最后一页页数
+    pagination = package.comments.order_by(Comment.timestamp.asc()).paginate(
+        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+        error_out=False)
+    comments = pagination.items
+    return render_template('rpm_vote.html', pkg=package, form=form,
+                           comments=comments, pagination=pagination)

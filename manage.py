@@ -3,7 +3,7 @@
 import os
 from app import create_app, db
 from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
-    Category, BlogView, OAuth, OAuthType, Chrome
+    Category, BlogView, OAuth, OAuthType, Chrome, Package, Release
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -33,7 +33,7 @@ def make_shell_context():
     return dict(app=app, db=db, User=User, Follow=Follow, Role=Role,
                 Permission=Permission, Post=Post, Comment=Comment,
                 Tag=Tag, Category=Category, BlogView=BlogView, OAuth=OAuth,
-                OAuthType=OAuthType, Chrome=Chrome)
+                OAuthType=OAuthType, Chrome=Chrome, Package=Package, Release=Release)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 
@@ -64,6 +64,8 @@ def deploy(deploy_type='product'):
         Category.insert_category()
         # insert default oauth
         OAuthType.insert_oauth()
+        # insert default release
+        Release.insert_release()
 
     # run `python manage.py deploy test_data`
     if deploy_type == 'test_data':
@@ -79,6 +81,12 @@ def deploy(deploy_type='product'):
         Post.generate_fake(500)
         # generate random comments
         Comment.generate_fake(5000)
+
+
+@manager.command
+def scan_repo():
+    '''Scan rpm package in repository.'''
+    Package.scan_repo()
 
 
 if __name__ == '__main__':

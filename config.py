@@ -16,6 +16,7 @@ class Config:
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.getenv('FLASKY_ADMIN')
     FLASKY_POSTS_PER_PAGE = 20
+    FLASKY_PKGS_PER_PAGE = 25
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
     SECRET_KEY = os.getenv('SECRET_KEY') or 'secret_key_string'  # 用于加密 session 的密钥
@@ -55,6 +56,20 @@ class Config:
     # Fedora FAS OpenID
     FAS_OPENID_ENDPOINT = 'https://id.fedoraproject.org/openid/'
     FAS_OPENID_CHECK_CERT = True
+
+    DEFAULT_CATEGORY = ['Python', 'JavaScript', 'CentOS', 'Fedora', 'MySQL', 'Redis']
+    DEFAULT_OAUTHS = ['github', 'google', 'fedora']
+    DEFAULT_RELEASES = ['F22', 'F23', 'F24', 'F25']
+    REPO_URL = 'https://repo.fdzh.org/FZUG'
+    REPO_ARCH = ['x86_64', 'i386']
+    REPO_PATH = os.path.join(os.getenv('REPO_PATH'))
+    REPO_TESTING_DIR = os.getenv('REPO_TESTING_DIR') or 'testing'
+    REPO_STABLE_DIR = os.getenv('REPO_STABLE_DIR') or 'stable'
+    PKG_DEADLINE = 3600 * 24 * os.getenv('PKG_DEADLINE', 2)
+    KARMA_MINI_STABLE = 1
+    KARMA_TO_STABLE = 2
+    KARMA_MINI_OBSOLETE = -1
+    KARMA_TO_OBSOLETE = -2
 
     @staticmethod
     def init_app(app):

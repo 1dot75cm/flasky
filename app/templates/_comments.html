@@ -28,7 +28,11 @@
                 {% else %}
                 <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">Disable</a>
                 {% endif %}
+                {% if comment.post_id %}
                 <a class="label label-default" href="{{ url_for('.post', id=comment.post.id) }}#comments">Permalink</a>
+                {% else %}
+                <a class="label label-default" href="{{ url_for('.get_rpm_task', id=comment.package.task_id) }}#comments">Permalink</a>
+                {% endif %}
             {% endif %}
         </div>
     </li>
