@@ -1,6 +1,8 @@
 # coding: utf-8
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.getcwd())
+datadir = os.path.join(basedir, 'data')
+logdir  = os.path.join(datadir, 'logs')
 
 
 class Config:
@@ -70,6 +72,7 @@ class Config:
     KARMA_TO_STABLE = 2
     KARMA_MINI_OBSOLETE = -1
     KARMA_TO_OBSOLETE = -2
+    INTERVAL = 3600 * os.getenv('INTERVAL', 0.5)
 
     @staticmethod
     def init_app(app):

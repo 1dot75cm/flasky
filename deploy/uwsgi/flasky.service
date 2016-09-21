@@ -1,0 +1,15 @@
+[Unit]
+Description=Flasky daemon
+After=syslog.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/uwsgi
+WorkingDirectory=/path/to/webroot/
+ExecStart=/path/to/webroot/daemons.py
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

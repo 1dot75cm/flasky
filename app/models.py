@@ -878,9 +878,14 @@ class Package(db.Model):
             for pkg in pkgs[arch]:
                 source = os.path.join(spath, pkg)
                 target = os.path.join(tpath, pkg)
-                shutil.move(source, target)
-            self.create_repo([spath, tpath])
+                try:
+                    shutil.move(source, target)
+                except IOError as e:
+                    print e
+            if not os.environ.get('IS_DAEMON', ''):
+                self.create_repo([spath, tpath])
         db.session.add(self)
+        db.session.commit()
         return True
 
     def to_obsolete(self):

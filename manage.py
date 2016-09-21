@@ -89,5 +89,25 @@ def scan_repo():
     Package.scan_repo()
 
 
+@manager.command
+def check_karma():
+    '''Check karma and push package.'''
+    pkgs = Package.query.all()
+    for pkg in pkgs:
+        pkg.check_karma()
+
+
+@manager.command
+def create_repo():
+    '''Create repositories.'''
+    base = app.config['REPO_PATH']
+    releases = app.config['DEFAULT_RELEASES']
+    for release in releases:
+        for arch in app.config['REPO_ARCH']:
+            spath = os.path.join(base, app.config['REPO_TESTING_DIR'], release[1:], arch)
+            tpath = os.path.join(base, app.config['REPO_STABLE_DIR'], release[1:], arch)
+            Package.create_repo([spath, tpath])
+
+
 if __name__ == '__main__':
     manager.run()
