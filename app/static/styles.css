@@ -194,6 +194,11 @@ div.flask-pagedown-preview h3 {
     font-size: 120%;
 }
 
+.post-body img, .flask-pagedown-preview img {
+    max-inline-size: 90%; /* for Gecko */
+    max-width: 90%; /* for Blink */
+}
+
 #sideBar {
     font-size: 120%;
     font-family: Arial, Helvetica, sans-serif;

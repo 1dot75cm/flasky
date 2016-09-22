@@ -111,4 +111,18 @@ $(function() {
     $("#sideBar").mouseleave(function() {
         $("#sideBarContents").css("display", "none");
     });
+    /* 图片父元素添加居中 */
+    $(".post-body img, .flask-pagedown-preview img").parent("p")
+        .css("text-align", "center");
+    $(".flask-pagedown-preview").mouseenter(function() {
+        $(".flask-pagedown-preview img").parent("p")
+            .css("text-align", "center");
+    });
+    /* 图片添加链接 */
+    $(".post-body img").each(function() {
+        let img = $(this).clone(true);
+        $("<a>").attr("href", img.attr("src"))
+            .attr("title", img.attr("alt"))
+            .append(img).replaceAll($(this));
+    });
 });
