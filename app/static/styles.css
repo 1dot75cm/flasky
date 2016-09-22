@@ -194,6 +194,55 @@ div.flask-pagedown-preview h3 {
     font-size: 120%;
 }
 
+#sideBar {
+    font-size: 120%;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+    position: fixed; /* 固定div位置 */
+    top: 20%;
+    right: 0px;
+    width: auto;
+    height: auto;
+    z-index: 99;
+}
+
+#sideBarTab {
+    float: left;
+    width: 30px;
+    border: 1px solid #e5e5e5;
+    border-right: none;
+    text-align: center;
+    background: #ffffff;
+    writing-mode: vertical-rl;
+}
+
+#sideBarTab h2 {
+    margin: 0;
+    padding: 10px 2px;
+}
+
+#sideBarContents {
+    float: left;
+    overflow: auto;
+    overflow-x: hidden !important;
+    min-width: 160px;
+    min-height: 110px;
+    max-height: 420px;
+    border: 1px solid #e5e5e5;
+    border-right: none;
+    background: #ffffff;
+    padding: 10px 10px 10px 0;
+}
+
+#sideBarContents ul {
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+#sideBarContents li a:hover {
+    color: #979;
+}
+
 .tag-size {
     font-size: 14px;
     margin-right: 0.5em;
