@@ -18,6 +18,10 @@ install:
 	pip install -r requirements/prod.txt; \
 	$(SUDO) pip install uwsgi
 
+	@echo "Download pygments css <--"
+	@wget https://raw.githubusercontent.com/richleland/pygments-css/master/friendly.css \
+		-P app/static/
+
 deploy: install
 	@echo "Copy configuration files <--"
 	@sed -i "s|<BASE_PATH>|"$(BASE_PATH)"|g" \

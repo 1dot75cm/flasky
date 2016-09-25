@@ -72,5 +72,5 @@ class PostForm(Form):
 
 class CommentForm(Form):
     '''评论表单'''
-    body = StringField('Enter your comment', validators=[Required()])
+    body = TextAreaField('Enter your comment', validators=[Required()])
     submit = SubmitField('Submit')

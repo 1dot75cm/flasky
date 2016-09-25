@@ -420,13 +420,17 @@ class Post(db.Model):
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
         '''将 Markdown 转为 HTML'''
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'p', 'img']
+        allowed_tags = ['a', 'abbr', 'acronym', 'br', 'blockquote', 'img',
+                        'em', 'i', 'strong', 'b', 'ol', 'ul', 'li',
+                        'span', 'code', 'pre', 'p', 'div',
+                        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                        'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         allowed_attrs = {'a': ['href', 'title'], 'abbr': ['title'],
-                         'acronym': ['title'], 'img': ['alt', 'src']}
+                         'acronym': ['title'], 'img': ['alt', 'src'],
+                         'span': ['class'], 'div': ['class']}
+        extensions = ['extra', 'codehilite', 'nl2br', 'sane_lists']
         target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
+            markdown(value, output_format='html', extensions=extensions),
             tags=allowed_tags, attributes=allowed_attrs, strip=True))
         # 1. markdown() 将 md 转为 html
         # 2. bleach.clean() 清除不在白名单中的标签
@@ -488,12 +492,16 @@ class Comment(db.Model):
     def on_changed_body(target, value, oldvalue, initiator):
         '''将 Markdown 转为 HTML'''
         # 评论要求更严, 删除段落相关的标签, 只留下格式化字符的标签
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
-                        'strong', 'p', 'img']
+        allowed_tags = ['a', 'abbr', 'acronym', 'br', 'blockquote', 'img',
+                        'em', 'i', 'strong', 'b', 'ol', 'ul', 'li',
+                        'span', 'code', 'pre', 'p', 'div',
+                        'table', 'thead', 'tbody', 'tr', 'th', 'td']
         allowed_attrs = {'a': ['href', 'title'], 'abbr': ['title'],
-                         'acronym': ['title'], 'img': ['alt', 'src']}
+                         'acronym': ['title'], 'img': ['alt', 'src'],
+                         'span': ['class'], 'div': ['class']}
+        extensions = ['extra', 'codehilite', 'nl2br', 'sane_lists']
         target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
+            markdown(value, output_format='html', extensions=extensions),
             tags=allowed_tags, attributes=allowed_attrs, strip=True))
 
     def to_json(self):
