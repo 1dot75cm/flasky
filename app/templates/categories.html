@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-md-8">
 
-    <h4>Categories</h4>
+    <h4>{{ _('Categories') }}</h4>
 {% for category in categories %}
     <a href="{{ url_for('.get_category', id=category.id) }}">
         <span class="label label-info tag-size">{{ category.name }}</span>
@@ -15,9 +15,9 @@
 {% endfor %}
     <hr />
 {% if category %}
-    <h4>Articles with {{ category.name }} category</h4>
+    <h4>{{ _('Articles with %(name)s category', name=category.name) }}</h4>
 {% else %}
-    <h4>Articles</h4>
+    <h4>{{ _('Articles') }}</h4>
 {% endif %}
 
 {% include '_posts.html' %}

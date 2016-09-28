@@ -12,33 +12,33 @@
 <div class="page-content">
     <table class="table table-hover followers">
         <tr>
-            <td>Builds</td>
+            <td>{{ _('Builds') }}</td>
             <td>{{ pkg.name }}</td>
         </tr>
         <tr>
-            <td>Packages</td>
+            <td>{{ _('Packages') }}</td>
             <td>
                 <p>i386: {{ pkg.get_pkg_dict()['i386'] | join(', ') }}</p>
                 <p>x86_64: {{ pkg.get_pkg_dict()['x86_64'] | join(', ') }}</p>
             </td>
         </tr>
         <tr>
-            <td>Update ID</td>
+            <td>{{ _('Update ID') }}</td>
             <td><a href="{{ url_for('main.get_rpm_task', id=pkg.task_id)}}">{{ pkg.task_id }}</a></td>
         </tr>
         <tr>
-            <td>Release</td>
+            <td>{{ _('Release') }}</td>
             <td>{{ pkg.release.name }}</td>
         </tr>
         <tr>
-            <td>Karma</td>
+            <td>{{ _('Karma') }}</td>
             <td>
                 <span class="label label-{% if pkg.karma >= 0 %}success{% else %}danger{% endif %}">
                 {% if pkg.karma > 0 %}+{% endif %}{{ pkg.karma }}</span>
             </td>
         </tr>
         <tr>
-            <td>Status</td>
+            <td>{{ _('Status') }}</td>
             <td>
                 {% if pkg.status == 'pending' %}
                 <span class="label label-primary">{{ pkg.status }}</span>
@@ -52,7 +52,7 @@
             </td>
         </tr>
         <tr>
-            <td>Submitted</td>
+            <td>{{ _('Submitted') }}</td>
             <td><time class="table-date">{{ moment(pkg.timestamp).fromNow(refresh=True) }}</time></td>
         </tr>
     </table>
@@ -60,15 +60,17 @@
 
 <div class="comments-body">
     <h4 id="comments">
-        <span class="glyphicon glyphicon-comment"></span>Comments</h4>
+        <span class="glyphicon glyphicon-comment"></span>{{ _('Comments') }}</h4>
 
 {% if current_user.can(Permission.COMMENT) %}
     <div class="comment-form">
         {{ wtf.quick_form(form) }}
     </div>
 {% else %}
-    <p>You need to <a href="{{ url_for('auth.login', next=url_for('main.get_rpm_task', id=pkg.task_id)) }}">
-click here</a> to login for comment.</p>
+    {% autoescape false %}
+    <p>{{ _('You need to <a href="%(url)s">click here</a> to login for comment.',
+            url=url_for('auth.login', next=url_for('main.get_rpm_task', id=pkg.task_id))) }}</p>
+    {% endautoescape %}
 {% endif %}
 
 {% include '_comments.html' %}

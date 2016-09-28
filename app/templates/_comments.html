@@ -11,7 +11,7 @@
             <div class="comment-author"><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a></div>
             <div class="comment-body">
                 {% if comment.disabled %}  <!-- 不显示不当言论 -->
-                <p><i>This comment has been disabled by a moderator.</i></p>
+                <p><i>{{ _('This comment has been disabled by a moderator.') }}</i></p>
                 {% endif %}
                 {% if moderate or not comment.disabled %}  <!-- 管理员可查看所有评论 -->
                     {% if comment.body_html %}
@@ -24,14 +24,14 @@
             {% if moderate %}  <!-- 显示管理按钮 -->
                 <br>
                 {% if comment.disabled %}
-                <a class="btn btn-success btn-xs" href="{{ url_for('.moderate_enable', id=comment.id, page=page) }}">Enable</a>
+                <a class="btn btn-success btn-xs" href="{{ url_for('.moderate_enable', id=comment.id, page=page) }}">{{ _('Enable') }}</a>
                 {% else %}
-                <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">Disable</a>
+                <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">{{ _('Disable') }}</a>
                 {% endif %}
                 {% if comment.post_id %}
-                <a class="label label-default" href="{{ url_for('.post', id=comment.post.id) }}#comments">Permalink</a>
+                <a class="label label-default" href="{{ url_for('.post', id=comment.post.id) }}#comments">{{ _('Permalink') }}</a>
                 {% else %}
-                <a class="label label-default" href="{{ url_for('.get_rpm_task', id=comment.package.task_id) }}#comments">Permalink</a>
+                <a class="label label-default" href="{{ url_for('.get_rpm_task', id=comment.package.task_id) }}#comments">{{ _('Permalink') }}</a>
                 {% endif %}
             {% endif %}
         </div>

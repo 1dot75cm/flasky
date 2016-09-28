@@ -10,14 +10,17 @@
 
 <div class="comments-body">
     <h4 id="comments">
-        <span class="glyphicon glyphicon-comment"></span>Comments</h4>
+        <span class="glyphicon glyphicon-comment"></span>{{ _('Comments') }}</h4>
 
 {% if current_user.can(Permission.COMMENT) %}
     <div class="comment-form">
         {{ wtf.quick_form(form) }}
     </div>
 {% else %}
-    <p>You need to <a href="{{ url_for('auth.login', next=url_for('.post', id=posts[0].id)) }}">click here</a> to login for post comment.</p>
+    {% autoescape false %}
+    <p>{{ _('You need to <a href="%(url)s">click here</a> to login for post comment.',
+            url=url_for('auth.login', next=url_for('.post', id=posts[0].id))) }}</p>
+    {% endautoescape %}
 {% endif %}
 
 {% include '_comments.html' %}

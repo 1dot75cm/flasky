@@ -5,9 +5,9 @@
 
 {% block page_content %}
 {% if current_user.username == user.username %}
-<h3>My favorites</h3>
+<h3>{{ _('My favorites') }}</h3>
 {% else %}
-<h3>Favorited by {{ user.username }}</h3>
+<h3>{{ _('Favorited by %(username)s', username=user.username) }}</h3>
 {% endif %}
 
 {% include '_posts.html' %}

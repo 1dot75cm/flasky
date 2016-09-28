@@ -25,6 +25,7 @@ app.jinja_env.globals['Comment'] = Comment
 app.jinja_env.globals['Tag'] = Tag
 app.jinja_env.globals['Category'] = Category
 app.jinja_env.globals['BlogView'] = BlogView
+app.jinja_env.globals['Language'] = app.config['LANGUAGES']
 app.jinja_env.filters['split'] = string_split
 
 
@@ -107,6 +108,31 @@ def create_repo():
             spath = os.path.join(base, app.config['REPO_TESTING_DIR'], release[1:], arch)
             tpath = os.path.join(base, app.config['REPO_STABLE_DIR'], release[1:], arch)
             Package.create_repo([spath, tpath])
+
+
+@manager.command
+def tran_init(code):
+    '''Initial new language and create directory.'''
+    pybabel = 'venv/bin/pybabel'
+    os.system(pybabel + ' extract -F babel.cfg -k lazy_gettext -o messages.pot app')  # 生成翻译模板
+    os.system('%s init -i messages.pot -d app/translations -l %s' % (pybabel, code))  # 初始化新语言
+    os.unlink('messages.pot')
+
+
+@manager.command
+def tran_update():
+    '''Update language directory.'''
+    pybabel = 'venv/bin/pybabel'
+    os.system(pybabel + ' extract -F babel.cfg -k lazy_gettext -o messages.pot app')  # 生成翻译模板
+    os.system(pybabel + ' update -i messages.pot -d app/translations')  # 更新语言翻译
+    os.unlink('messages.pot')
+
+
+@manager.command
+def tran_compile():
+    '''Generate binary message catalog (mo file).'''
+    pybabel = 'venv/bin/pybabel'
+    os.system(pybabel + ' compile -d app/translations')  # 生成 mo 文件
 
 
 if __name__ == '__main__':

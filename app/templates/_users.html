@@ -1,6 +1,6 @@
 <!-- 用户列表 -->
 <table class="table table-hover followers">
-    <thead><tr><th>User</th><th>Since</th><th>Follow</th></tr></thead>
+    <thead><tr><th>{{ _('User') }}</th><th>{{ _('Since') }}</th><th>{{ _('Follow') }}</th></tr></thead>
     {% for user in users %}
     <tr>
         <td>
@@ -14,9 +14,9 @@
         {% if current_user.is_authenticated %}
             {% if current_user.can(Permission.FOLLOW) and user != current_user %}
                 {% if not current_user.is_following(user) %}
-                <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">Follow</a>
+                <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">{{ _('Follow') }}</a>
                 {% else %}
-                <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">Unfollow</a>
+                <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">{{ _('Unfollow') }}</a>
                 {% endif %}
             {% endif %}
         {% endif %}

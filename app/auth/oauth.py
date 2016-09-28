@@ -1,6 +1,7 @@
 # coding: utf-8
 from flask import request, jsonify, json, url_for, session, g, redirect, flash
 from flask_login import login_user
+from flask_babel import gettext as _
 from . import auth
 from .. import db, oauth, fas
 from ..models import User, OAuth, OAuthType
@@ -45,11 +46,11 @@ def oauth_authorized():
                                  remote_uid=g.fas_user.username))
             db.session.add(u)
             login_user(u)
-            flash('Hello, %s.' % u.username, 'success')
+            flash(_('Hello, %(username)s.', username=u.username), 'success')
             return redirect(request.args.get('next') or url_for('main.index'))
         if oauth:
             login_user(oauth.local)
-            flash('Hello, %s.' % oauth.local.username, 'success')
+            flash(_('Hello, %(username)s.', username=oauth.local.username), 'success')
             return redirect(request.args.get('next') or url_for('main.index'))
 
     if op == 'google':
@@ -78,12 +79,12 @@ def oauth_authorized():
                                          access_token=resp['access_token']))
                     db.session.add(u)
                     login_user(u)
-                    flash('Hello, %s.' % u.username, 'success')
+                    flash(_('Hello, %(username)s.', username=u.username), 'success')
                     return redirect(request.args.get('next') or url_for('main.index'))
                 if oauth:  # 再次授权, 更新token
                     oauth.access_token = resp['access_token']
                     login_user(oauth.local)
-                    flash('Hello, %s.' % oauth.local.username, 'success')
+                    flash(_('Hello, %(username)s.', username=oauth.local.username), 'success')
                     return redirect(request.args.get('next') or url_for('main.index'))
 
     if op == 'github':
@@ -114,14 +115,14 @@ def oauth_authorized():
                                          access_token=resp['access_token']))
                     db.session.add(u)
                     login_user(u)
-                    flash('Hello, %s.' % u.username, 'success')
+                    flash(_('Hello, %(username)s.', username=u.username), 'success')
                     return redirect(request.args.get('next') or url_for('main.index'))
                 if oauth:  # 再次授权, 更新token
                     oauth.access_token = resp['access_token']
                     login_user(oauth.local)
-                    flash('Hello, %s.' % oauth.local.username, 'success')
+                    flash(_('Hello, %(username)s.', username=oauth.local.username), 'success')
                     return redirect(request.args.get('next') or url_for('main.index'))
-    flash('Access denied.', 'danger')
+    flash(_('Access denied.'), 'danger')
     return redirect(request.args.get('next') or url_for('.login'))
 
 

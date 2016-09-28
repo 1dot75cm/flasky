@@ -5,7 +5,7 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h3>Favorites with "{{ post.title }}"</h3>
+    <h3>{{ _('Favorites with "%(title)s"', title=post.title) }}</h3>
 </div>
 
 {% include '_users.html' %}

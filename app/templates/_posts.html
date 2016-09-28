@@ -8,22 +8,22 @@
             <a href="{{ url_for('.edit', id=post.id) }}">
                 <span class="label label-primary">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    Edit</span>
+                    {{ _('Edit') }}</span>
             </a>
             {% elif current_user.is_administrator() %}
             <a href="{{ url_for('.edit', id=post.id) }}">
                 <span class="label label-danger">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    Edit [Admin]</span>
+                    {{ _('Edit [Admin]') }}</span>
             </a>
             {% endif %}
             {% if current_user.is_favorite(post) %}
             <a href="{{ url_for('.del_favorite', id=post.id) }}">
-                <span class="label label-danger">unfavorite</span>
+                <span class="label label-danger">{{ _('unfavorite') }}</span>
             </a>
             {% else %}
             <a href="{{ url_for('.add_favorite', id=post.id) }}">
-                <span class="label label-success">favorite</span>
+                <span class="label label-success">{{ _('favorite') }}</span>
             </a>
             {% endif %}
         </div>
@@ -54,13 +54,13 @@
 
             <div class="post-footer">
                 <a href="#">
-                    <span class="label label-primary">{{ post.num_of_view }} Views</span>
+                    <span class="label label-primary">{{ _('%(count)s Views', count=post.num_of_view) }}</span>
                 </a>
                 <a href="{{ url_for('.get_favorite_users', id=post.id) }}">
-                    <span class="label label-default">{{ post.favorite_users.count() }} Favorites</span>
+                    <span class="label label-default">{{ _('%(count)s Favorites', count=post.favorite_users.count()) }}</span>
                 </a>
                 <a href="{{ url_for('.post', id=post.id) }}#comments">
-                    <span class="label label-success">{{ post.comments.count() }} Comments</span>
+                    <span class="label label-success">{{ _('%(count)s Comments', count=post.comments.count()) }}</span>
                 </a>
             </div>
 
@@ -73,7 +73,7 @@
                 {% endif %}
             </div>
             {% if post.tags|list()|length() > 0 %}
-            <div class="post-footer">Tag:
+            <div class="post-footer">{{ _('Tag:') }}
                 {% for tag in post.tags %}
                 <a href="{{ url_for('.get_tag', id=tag.id) }}">
                     <span class="label label-primary">{{ tag.name }}</span>

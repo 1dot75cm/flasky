@@ -26,16 +26,16 @@
             <ul class="nav navbar-nav">
                 <li>
                     <a href="{{ url_for('main.index') }}">
-                        <span class="glyphicon glyphicon-home">Home</span>
+                        <span class="glyphicon glyphicon-home">{{ _('Home') }}</span>
                     </a>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <span class="glyphicon glyphicon-wrench">Tools<b class="caret"></b></span>
+                        <span class="glyphicon glyphicon-wrench">{{ _('Tools') }}<b class="caret"></b></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('main.get_chrome', os='win') }}">Get Chrome</a></li>
-                        <li><a href="{{ url_for('main.get_rpm_items') }}">RPM Update System</a></li>
+                        <li><a href="{{ url_for('main.get_chrome', os='win') }}">{{ _('Get Chrome') }}</a></li>
+                        <li><a href="{{ url_for('main.get_rpm_items') }}">{{ _('RPM Update System') }}</a></li>
                     </ul>
                 </li>
             </ul>
@@ -47,19 +47,19 @@
                         {{ current_user.username }} <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a></li>
+                        <li><a href="{{ url_for('main.user', username=current_user.username) }}">{{ _('Profile') }}</a></li>
                         <!-- 管理评论链接 -->
                         {% if current_user.can(Permission.MODERATE_COMMENTS) %}
-                        <li><a href="{{ url_for('main.moderate') }}">Moderate Comments</a></li>
+                        <li><a href="{{ url_for('main.moderate') }}">{{ _('Moderate Comments') }}</a></li>
                         {% endif %}
-                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
-                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                        <li><a href="{{ url_for('auth.change_password') }}">{{ _('Change Password') }}</a></li>
+                        <li><a href="{{ url_for('auth.change_email_request') }}">{{ _('Change Email') }}</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">{{ _('Log Out') }}</a></li>
                     </ul>
                 </li>
                 {% else %}
-                <li><a href="{{ url_for('auth.register') }}">Sign Up</a></li>
-                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+                <li><a href="{{ url_for('auth.register') }}">{{ _('Sign Up') }}</a></li>
+                <li><a href="{{ url_for('auth.login') }}">{{ _('Log In') }}</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -73,7 +73,7 @@
         <div class="col-md-8">
             <!-- 使用 get_flashed_messages() 函数获取并渲染消息 -->
             {% for category, message in get_flashed_messages(with_categories=true) %}
-            <div class="alert alert-{{ category }}">
+            <div class="alert {% if category != 'message' %}alert-{{ category }}{% else %}alert-warning{% endif %}">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
                 {{ message }}
             </div>
@@ -84,11 +84,11 @@
         <div class="col-md-4">
             {% block page_plugin %}
                 <div class="entry-box">
-                    <h5><strong>博客统计</strong></h5>
-                    <p>访问量：<span class="badge">{{ BlogView.query.count() }}</span></p>
+                    <h5><strong>{{ _('Blog Statistics') }}</strong></h5>
+                    <p>{{ _('Views:') }} <span class="badge">{{ BlogView.query.count() }}</span></p>
                     <p>
-                        博文总数：<span class="badge">{{ Post.query.count() }}</span>
-                        评论总数：<span class="badge">{{ Comment.query.count() }}</span>
+                        {{ _('Articles:') }} <span class="badge">{{ Post.query.count() }}</span>
+                        {{ _('Comments:') }} <span class="badge">{{ Comment.query.count() }}</span>
                     </p>
                 </div>
             {% endblock %}
@@ -100,6 +100,17 @@
     <a target="_blank" href="//github.com/1dot75cm/flasky">Flasky</a>,
     <a target="_blank" href="//github.com/pallets/flask/">Flask</a> and
     <a target="_blank" href="//github.com/twbs/bootstrap/">Bootstrap</a>.
+    <div class="btn-group dropup">
+        <button type="button" class="btn btn-sm btn-default" data-toggle="dropdown">
+            {{ _('Language') }}
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            {% for key, value in Language.items() %}
+            <li><a href="{{ url_for('main.set_locale', lang=key, next=request.url) }}">{{ value[0].decode('utf-8') }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
 </footer>
 {% endblock %}
 
@@ -107,5 +118,8 @@
 {{ super() }}
 <!-- 引入 moment.js 库 -->
 {{ moment.include_moment() }}
+{% if session.get('locale') %}
+{{ moment.lang(Language[session.locale][1]) }}
+{% endif %}
 <script type="text/javascript" src="{{ url_for('static', filename='posts.js') }}"></script>
 {% endblock %}

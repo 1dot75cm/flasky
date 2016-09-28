@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import Flask
+from flask import Flask, request, session
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_moment import Moment
@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_oauthlib.client import OAuth
 from flask_fas_openid import FAS
+from flask_babel import Babel, lazy_gettext
 from sqlalchemy import MetaData
 from config import config
 
@@ -28,10 +29,12 @@ db = SQLAlchemy(metadata=metadata)
 pagedown = PageDown()
 oauth = OAuth()
 fas = FAS(Flask(__name__))
+babel = Babel()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'  # 会话安全等级
 login_manager.login_view = 'auth.login'  # 登陆页endpoint
+login_manager.login_message = lazy_gettext('Please log in to access this page.')  # 惰性求值
 
 
 def create_app(config_name):
@@ -50,6 +53,7 @@ def create_app(config_name):
     pagedown.init_app(app)
     oauth.init_app(app)
     fas.__init__(app)
+    babel.init_app(app)
 
     # 附加路由和错误页面, 在蓝图中定义
     from .main import main as main_blueprint
@@ -60,5 +64,14 @@ def create_app(config_name):
 
     from .api_1_0 import api as api_1_0_blueprint
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
+
+    @babel.localeselector
+    def get_locale():
+        '''读取请求的 Accept-Language 头或 Cookie,
+        从支持的语言列表中选择语言'''
+        if session.get('locale'):
+            return session['locale']
+        return request.accept_languages.best_match(
+            app.config['LANGUAGES'].keys())
 
     return app

@@ -1,0 +1,684 @@
+# Chinese (Simplified) translations for Flasky.
+# Copyright (C) 2016 ORGANIZATION
+# This file is distributed under the same license as the Flasky project.
+# 1dot75cm <sensor.wen@gmail.com>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  1.0\n"
+"Report-Msgid-Bugs-To: sensor.wen@gmail.com\n"
+"POT-Creation-Date: 2016-09-29 16:16+0800\n"
+"PO-Revision-Date: 2016-09-28 01:28+0800\n"
+"Last-Translator: 1dot75cm <sensor.wen@gmail.com>\n"
+"Language: zh_Hans\n"
+"Language-Team: zh_Hans <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: app/__init__.py:37
+msgid "Please log in to access this page."
+msgstr "您需要登陆才能访问该页面。"
+
+#: app/auth/forms.py:12 app/auth/forms.py:20 app/auth/forms.py:52
+#: app/auth/forms.py:58 app/main/forms.py:27
+msgid "Email"
+msgstr "邮箱"
+
+#: app/auth/forms.py:13 app/auth/forms.py:25 app/auth/forms.py:73
+msgid "Password"
+msgstr "密码"
+
+#: app/auth/forms.py:14
+msgid "Keep me logged in"
+msgstr "记住我"
+
+#: app/auth/forms.py:15 app/templates/base.html:62
+msgid "Log In"
+msgstr "登陆"
+
+#: app/auth/forms.py:21 app/main/forms.py:28
+msgid "Username"
+msgstr "用户名"
+
+#: app/auth/forms.py:23 app/main/forms.py:30
+msgid "Usernames must have only letters, numbers, dots or underscores"
+msgstr "用户名只能使用字母, 数字, 点或下划线"
+
+#: app/auth/forms.py:26 app/auth/forms.py:45 app/auth/forms.py:60
+msgid "Passwords must match."
+msgstr "密码不匹配。"
+
+#: app/auth/forms.py:27 app/auth/forms.py:61
+msgid "Confirm password"
+msgstr "确认密码"
+
+#: app/auth/forms.py:28 app/templates/auth/register.html:8
+msgid "Register"
+msgstr "注册"
+
+#: app/auth/forms.py:33 app/auth/forms.py:79 app/main/forms.py:50
+msgid "Email already registered."
+msgstr "邮箱已被注册。"
+
+#: app/auth/forms.py:38 app/main/forms.py:56
+msgid "Username already in use."
+msgstr "用户名已被使用。"
+
+#: app/auth/forms.py:43
+msgid "Old password"
+msgstr "旧密码"
+
+#: app/auth/forms.py:44 app/auth/forms.py:59
+msgid "New password"
+msgstr "新密码"
+
+#: app/auth/forms.py:46
+msgid "Confirm new password"
+msgstr "确认新密码"
+
+#: app/auth/forms.py:47
+msgid "Update Password"
+msgstr "更新密码"
+
+#: app/auth/forms.py:53 app/auth/forms.py:62
+msgid "Reset Password"
+msgstr "重置密码"
+
+#: app/auth/forms.py:67
+msgid "Unknown email address."
+msgstr "未知的邮箱地址。"
+
+#: app/auth/forms.py:72
+msgid "New Email"
+msgstr "新邮箱"
+
+#: app/auth/forms.py:74
+msgid "Update Email Address"
+msgstr "更新邮箱地址"
+
+#: app/auth/oauth.py:49 app/auth/oauth.py:53 app/auth/oauth.py:82
+#: app/auth/oauth.py:87 app/auth/oauth.py:118 app/auth/oauth.py:123
+#: app/auth/views.py:41
+#, python-format
+msgid "Hello, %(username)s."
+msgstr "您好，%(username)s。"
+
+#: app/auth/oauth.py:125
+msgid "Access denied."
+msgstr "拒绝访问。"
+
+#: app/auth/views.py:43
+msgid "Invalid username or password."
+msgstr "无效的用户名或密码。"
+
+#: app/auth/views.py:55
+msgid "You have been logged out."
+msgstr "您已成功登出。"
+
+#: app/auth/views.py:73
+msgid "A confirmation email has been sent to you by email."
+msgstr "已向您的邮箱发送了一封确认邮件。"
+
+#: app/auth/views.py:85
+msgid "You have confirmed your account. Thanks!"
+msgstr "您的账户已成功通过验证。"
+
+#: app/auth/views.py:87
+msgid "The confirmation link is invalid or has expired."
+msgstr "确认链接无效或已过期。"
+
+#: app/auth/views.py:98
+msgid "A new confirmation email has been sent to you by email."
+msgstr "已向您的邮箱重新发送了一封确认邮件。"
+
+#: app/auth/views.py:111 app/auth/views.py:151
+msgid "Your password has been updated."
+msgstr "密码已更新。"
+
+#: app/auth/views.py:114
+msgid "Invalid password."
+msgstr "无效的密码。"
+
+#: app/auth/views.py:132
+msgid "An email with instructions to reset your password has been sent to you."
+msgstr "已发送重置密码邮件。"
+
+#: app/auth/views.py:136
+msgid "Email address is unknown."
+msgstr "邮件地址未知。"
+
+#: app/auth/views.py:153
+msgid "Your password has been update failed."
+msgstr "密码修改失败。"
+
+#: app/auth/views.py:170
+msgid ""
+"An email with instructions to confirm your new email address has been "
+"sent to you."
+msgstr "已向您的新邮箱发送了确认邮件。"
+
+#: app/auth/views.py:174
+msgid "Invalid email or password."
+msgstr "无效的邮箱或密码。"
+
+#: app/auth/views.py:183
+msgid "Your email address has been updated."
+msgstr "邮箱已更新。"
+
+#: app/auth/views.py:185
+msgid "Invalid request."
+msgstr "无效的请求。"
+
+#: app/main/forms.py:13
+msgid "What is your name?"
+msgstr "您叫什么名字？"
+
+#: app/main/forms.py:14 app/main/forms.py:22 app/main/forms.py:37
+#: app/main/forms.py:65 app/main/forms.py:77
+msgid "Submit"
+msgstr "提交"
+
+#: app/main/forms.py:19 app/main/forms.py:34
+msgid "Real name"
+msgstr "真实姓名"
+
+#: app/main/forms.py:20 app/main/forms.py:35
+msgid "Location"
+msgstr "住址"
+
+#: app/main/forms.py:21 app/main/forms.py:36
+msgid "About me"
+msgstr "关于我"
+
+#: app/main/forms.py:32
+msgid "Confirmed"
+msgstr "确认账户"
+
+#: app/main/forms.py:33
+msgid "Role"
+msgstr "角色"
+
+#: app/main/forms.py:61
+msgid "Title"
+msgstr "标题"
+
+#: app/main/forms.py:62 app/templates/tags.html:10
+msgid "Tags"
+msgstr "标签"
+
+#: app/main/forms.py:63 app/templates/categories.html:10
+msgid "Categories"
+msgstr "分类"
+
+#: app/main/forms.py:64
+msgid "What's on your mind?"
+msgstr "您有什么新鲜事？"
+
+#: app/main/forms.py:76
+msgid "Enter your comment"
+msgstr "输入您的评论"
+
+#: app/main/views.py:25
+msgid "Your current locale has been updated."
+msgstr "已成功切换语言。"
+
+#: app/main/views.py:28
+msgid "Invalid language code."
+msgstr "无效的语言代码。"
+
+#: app/main/views.py:47
+msgid "Your article has been updated."
+msgstr "文章已成功发布。"
+
+#: app/main/views.py:103
+msgid "Your profile has been updated."
+msgstr "个人资料已成功更新。"
+
+#: app/main/views.py:127
+msgid "The profile has been updated."
+msgstr "个人资料已成功更新。"
+
+#: app/main/views.py:150 app/main/views.py:456
+msgid "Your comment has been published."
+msgstr "评论发布成功。"
+
+#: app/main/views.py:179
+msgid "The post has been updated."
+msgstr "文章已成功更新。"
+
+#: app/main/views.py:195 app/main/views.py:212 app/main/views.py:227
+#: app/main/views.py:245
+msgid "Invalid user."
+msgstr "无效的用户。"
+
+#: app/main/views.py:198
+msgid "You are already following this user."
+msgstr "您已关注该用户。"
+
+#: app/main/views.py:201
+#, python-format
+msgid "You are now following %(username)s."
+msgstr "成功关注用户 %(username)s。"
+
+#: app/main/views.py:215
+msgid "You are not following this user."
+msgstr "您未关注该用户。"
+
+#: app/main/views.py:218
+#, python-format
+msgid "You are not following %(username)s anymore."
+msgstr "您已取消关注用户 %(username)s。"
+
+#: app/main/views.py:371 app/main/views.py:387
+msgid "Invalid post."
+msgstr "无效的文章。"
+
+#: app/main/views.py:374
+msgid "You are already favorite this post."
+msgstr "您已收藏该文章。"
+
+#: app/main/views.py:377
+#, python-format
+msgid "You are now favorite <%(post)s>."
+msgstr "收藏文章 《%(post)s》 成功。"
+
+#: app/main/views.py:390
+msgid "You are not favorite this post."
+msgstr "您未收藏该文章。"
+
+#: app/main/views.py:393
+#, python-format
+msgid "You are not favorite <%(post)s> anymore."
+msgstr "您已取消收藏文章 《%(post)s》。"
+
+#: app/templates/403.html:7
+msgid "Forbidden"
+msgstr "禁止访问"
+
+#: app/templates/404.html:7
+msgid "Not Found"
+msgstr "未找到"
+
+#: app/templates/500.html:7
+msgid "Internal Server Error"
+msgstr "内部错误！"
+
+#: app/templates/_comments.html:14
+msgid "This comment has been disabled by a moderator."
+msgstr "该评论已被版主禁止。"
+
+#: app/templates/_comments.html:27
+msgid "Enable"
+msgstr "启用"
+
+#: app/templates/_comments.html:29
+msgid "Disable"
+msgstr "禁用"
+
+#: app/templates/_comments.html:32 app/templates/_comments.html:34
+msgid "Permalink"
+msgstr "链接"
+
+#: app/templates/_posts.html:11
+msgid "Edit"
+msgstr "编辑"
+
+#: app/templates/_posts.html:17
+msgid "Edit [Admin]"
+msgstr "编辑 [管理员]"
+
+#: app/templates/_posts.html:22
+msgid "unfavorite"
+msgstr "取消收藏"
+
+#: app/templates/_posts.html:26
+msgid "favorite"
+msgstr "收藏"
+
+#: app/templates/_posts.html:57
+#, python-format
+msgid "%(count)s Views"
+msgstr "%(count)s 浏览"
+
+#: app/templates/_posts.html:60
+#, python-format
+msgid "%(count)s Favorites"
+msgstr "%(count)s 收藏"
+
+#: app/templates/_posts.html:63
+#, python-format
+msgid "%(count)s Comments"
+msgstr "%(count)s 评论"
+
+#: app/templates/_posts.html:76
+msgid "Tag:"
+msgstr "标签："
+
+#: app/templates/_users.html:3 app/templates/followers.html:11
+msgid "User"
+msgstr "用户"
+
+#: app/templates/_users.html:3 app/templates/followers.html:11
+msgid "Since"
+msgstr "加入时间"
+
+#: app/templates/_users.html:3 app/templates/_users.html:17
+#: app/templates/user.html:32
+msgid "Follow"
+msgstr "关注"
+
+#: app/templates/_users.html:19 app/templates/user.html:34
+msgid "Unfollow"
+msgstr "取消关注"
+
+#: app/templates/base.html:29
+msgid "Home"
+msgstr "主页"
+
+#: app/templates/base.html:34
+msgid "Tools"
+msgstr "工具"
+
+#: app/templates/base.html:37
+msgid "Get Chrome"
+msgstr "获取 Chrome"
+
+#: app/templates/base.html:38 app/templates/rpm_items.html:8
+msgid "RPM Update System"
+msgstr "RPM 更新系统"
+
+#: app/templates/base.html:50
+msgid "Profile"
+msgstr "个人资料"
+
+#: app/templates/base.html:53
+msgid "Moderate Comments"
+msgstr "管理评论"
+
+#: app/templates/base.html:55
+msgid "Change Password"
+msgstr "修改密码"
+
+#: app/templates/base.html:56
+msgid "Change Email"
+msgstr "修改邮箱"
+
+#: app/templates/base.html:57
+msgid "Log Out"
+msgstr "退出登陆"
+
+#: app/templates/base.html:61
+msgid "Sign Up"
+msgstr "注册"
+
+#: app/templates/base.html:87
+msgid "Blog Statistics"
+msgstr "博客统计"
+
+#: app/templates/base.html:88
+msgid "Views:"
+msgstr "访问量："
+
+#: app/templates/base.html:90
+msgid "Articles:"
+msgstr "文章数："
+
+#: app/templates/base.html:91
+msgid "Comments:"
+msgstr "评论数："
+
+#: app/templates/base.html:105
+msgid "Language"
+msgstr "语言"
+
+#: app/templates/categories.html:18
+#, python-format
+msgid "Articles with %(name)s category"
+msgstr "%(name)s 分类的文章"
+
+#: app/templates/categories.html:20 app/templates/tags.html:20
+msgid "Articles"
+msgstr "文章"
+
+#: app/templates/chrome.html:7
+msgid "Get Google Chrome versions"
+msgstr "获取 Google Chrome 版本"
+
+#: app/templates/chrome.html:11
+#, python-format
+msgid "Query time: %(time)s"
+msgstr "查询时间: %(time)s"
+
+#: app/templates/chrome.html:13
+msgid "(cache)"
+msgstr "(缓存)"
+
+#: app/templates/chrome.html:24
+msgid "Name"
+msgstr "名称"
+
+#: app/templates/chrome.html:25
+msgid "Version"
+msgstr "版本"
+
+#: app/templates/chrome.html:26
+msgid "OS"
+msgstr "系统"
+
+#: app/templates/chrome.html:27
+msgid "Arch"
+msgstr "架构"
+
+#: app/templates/chrome.html:28
+msgid "Channel"
+msgstr "分支"
+
+#: app/templates/chrome.html:29
+msgid "Size"
+msgstr "大小"
+
+#: app/templates/chrome.html:30
+msgid "URLs"
+msgstr "URLs"
+
+#: app/templates/edit_post.html:8
+msgid "Edit Post"
+msgstr "编辑文章"
+
+#: app/templates/edit_profile.html:8
+msgid "Edit Your Profile"
+msgstr "编辑个人资料"
+
+#: app/templates/favorite_posts.html:8
+msgid "My favorites"
+msgstr "我的收藏"
+
+#: app/templates/favorite_posts.html:10
+#, python-format
+msgid "Favorited by %(username)s"
+msgstr "%(username)s 的收藏"
+
+#: app/templates/favorite_users.html:8
+#, python-format
+msgid "Favorites with \"%(title)s\""
+msgstr "收藏 \"%(title)s\" 的用户"
+
+#: app/templates/index.html:18
+msgid "All"
+msgstr "所有"
+
+#: app/templates/index.html:20
+msgid "Followers"
+msgstr "关注"
+
+#: app/templates/moderate.html:8
+msgid "Comment Moderation"
+msgstr "管理评论"
+
+#: app/templates/post.html:13 app/templates/rpm_vote.html:63
+msgid "Comments"
+msgstr "评论"
+
+#: app/templates/post.html:21
+#, python-format
+msgid "You need to <a href=\"%(url)s\">click here</a> to login for post comment."
+msgstr "您需要<a href=\"%(url)s\">访问这里</a>进行登陆, 才能进行评论。"
+
+#: app/templates/rpm_items.html:22
+msgid "Update"
+msgstr "更新"
+
+#: app/templates/rpm_items.html:23
+msgid "Age"
+msgstr "时间"
+
+#: app/templates/rpm_items.html:24 app/templates/rpm_vote.html:30
+msgid "Release"
+msgstr "发布"
+
+#: app/templates/rpm_items.html:25 app/templates/rpm_vote.html:34
+msgid "Karma"
+msgstr "Karma"
+
+#: app/templates/rpm_items.html:26 app/templates/rpm_vote.html:41
+msgid "Status"
+msgstr "状态"
+
+#: app/templates/rpm_vote.html:15
+msgid "Builds"
+msgstr "构建名称"
+
+#: app/templates/rpm_vote.html:19
+msgid "Packages"
+msgstr "软件包"
+
+#: app/templates/rpm_vote.html:26
+msgid "Update ID"
+msgstr "更新 ID"
+
+#: app/templates/rpm_vote.html:55
+msgid "Submitted"
+msgstr "提交时间"
+
+#: app/templates/rpm_vote.html:71
+#, python-format
+msgid "You need to <a href=\"%(url)s\">click here</a> to login for comment."
+msgstr "您需要<a href=\"%(url)s\">访问这里</a>进行登陆, 才能进行评论。"
+
+#: app/templates/tags.html:18
+#, python-format
+msgid "Articles with %(name)s tag"
+msgstr "%(name)s 标签的文章"
+
+#: app/templates/user.html:15
+msgid "From"
+msgstr "来自"
+
+#: app/templates/user.html:23
+#, python-format
+msgid "Member since %(time)s. "
+msgstr "加入时间 %(time)s。"
+
+#: app/templates/user.html:24
+#, python-format
+msgid "Last seen %(time)s."
+msgstr "最后访问时间 %(time)s。"
+
+#: app/templates/user.html:25
+#, python-format
+msgid "%(count)s blog posts. "
+msgstr "%(count)s 篇博客文章。"
+
+#: app/templates/user.html:26
+#, python-format
+msgid "%(count)s comments. "
+msgstr "%(count)s 条评论。"
+
+#: app/templates/user.html:27
+#, python-format
+msgid "%(count)s times view me."
+msgstr "%(count)s 次浏览。"
+
+#: app/templates/user.html:28
+msgid "favorite posts."
+msgstr "篇收藏文章。"
+
+#: app/templates/user.html:37
+msgid "Followers:"
+msgstr "粉丝："
+
+#: app/templates/user.html:38
+msgid "Following:"
+msgstr "关注："
+
+#: app/templates/user.html:40
+msgid "Follows you"
+msgstr "您的粉丝"
+
+#: app/templates/user.html:45
+msgid "Edit Profile"
+msgstr "编辑个人资料"
+
+#: app/templates/user.html:50
+msgid "Edit Profile <small>[Admin]</small>"
+msgstr "编辑个人资料 <small>[管理员]</small>"
+
+#: app/templates/user.html:56
+#, python-format
+msgid "Posts by %(username)s"
+msgstr "%(username)s 的文章"
+
+#: app/templates/auth/change_email.html:8
+msgid "Change Your Email Address"
+msgstr "修改您的邮箱地址"
+
+#: app/templates/auth/change_password.html:8
+msgid "Change Your Password"
+msgstr "修改您的密码"
+
+#: app/templates/auth/login.html:8
+msgid "Login"
+msgstr "登陆"
+
+#: app/templates/auth/login.html:16
+#, python-format
+msgid "Forgot password? <a href=\"%(url)s\">Click here to reset it</a>."
+msgstr "忘记密码？ <a href=\"%(url)s\">点此重置密码</a>"
+
+#: app/templates/auth/login.html:18
+#, python-format
+msgid "New user? <a href=\"%(url)s\">Click here to register</a>."
+msgstr "新用户？ <a href=\"%(url)s\">点此注册账户</a>"
+
+#: app/templates/auth/login.html:21
+msgid "Other account login."
+msgstr "第三方账号登陆："
+
+#: app/templates/auth/reset_password.html:8
+msgid "Reset Your Password"
+msgstr "重置您的密码"
+
+#: app/templates/auth/unconfirmed.html:7
+#, python-format
+msgid "Hello, %(username)s!"
+msgstr "欢迎， %(username)s！"
+
+#: app/templates/auth/unconfirmed.html:8
+msgid "You have not confirmed your account yet."
+msgstr "您还没有验证您的账户。"
+
+#: app/templates/auth/unconfirmed.html:10
+msgid ""
+"Before you can access this site you need to confirm your account. Check "
+"your inbox, you should have received an email with a confirmation link."
+msgstr ""
+"在您访问本网站前，我们需要验证您的账户。\n"
+" 请检查您的收件箱，您应该会收到一封包含确认链接的邮件。"
+
+#: app/templates/auth/unconfirmed.html:15
+#, python-format
+msgid "Need another confirmation email? <a href=\"%(url)s\">Click here</a>"
+msgstr "您未收到账户确认邮件？ <a href=\"%(url)s\">点此重新发送</a>"

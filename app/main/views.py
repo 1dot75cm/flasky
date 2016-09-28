@@ -1,7 +1,8 @@
 # coding: utf-8
 from flask import render_template, redirect, url_for, abort, flash, request,\
-    current_app, make_response
+    current_app, make_response, session
 from flask_login import login_required, current_user
+from flask_babel import gettext as _
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
 from .. import db
@@ -14,6 +15,18 @@ from ..decorators import admin_required, permission_required
 def before_request():
     '''记录访问信息'''
     BlogView.add_view()
+
+
+@main.route('/locale/<lang>')
+def set_locale(lang):
+    '''设置默认语言, 保存至 session'''
+    if lang in current_app.config['LANGUAGES'].keys():
+        session['locale'] = lang
+        flash(_('Your current locale has been updated.'), 'success')
+        return redirect(request.args.get('next') or url_for('main.index'))
+    session['locale'] = ''
+    flash(_('Invalid language code.'), 'danger')
+    return redirect(request.args.get('next') or url_for('main.index'))
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -31,7 +44,7 @@ def index():
                     # 更新 body 字段后, 会自动调用 on_changed_body 渲染 HTML
         db.session.add(post)
         Tag.process_tag(post, form.tag.data)
-        flash('Your article has been updated.', 'success')
+        flash(_('Your article has been updated.'), 'success')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)  # 默认第一页
     show_followed = False
@@ -87,7 +100,7 @@ def edit_profile():
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
         db.session.add(current_user)
-        flash('Your profile has been updated.', 'success')
+        flash(_('Your profile has been updated.'), 'success')
         return redirect(url_for('.user', username=current_user.username))
     form.name.data = current_user.name
     form.location.data = current_user.location
@@ -111,7 +124,7 @@ def edit_profile_admin(id):
         user.location = form.location.data
         user.about_me = form.about_me.data
         db.session.add(user)
-        flash('The profile has been updated.', 'success')
+        flash(_('The profile has been updated.'), 'success')
         return redirect(url_for('.user', username=user.username))
     form.email.data = user.email
     form.username.data = user.username
@@ -134,7 +147,7 @@ def post(id):
                           post=post,
                           author=current_user._get_current_object())
         db.session.add(comment)
-        flash('Your comment has been published.', 'success')
+        flash(_('Your comment has been published.'), 'success')
         return redirect(url_for('.post', id=post.id, page=-1))  # -1 请求评论的最后一页
     page = request.args.get('page', 1, type=int)
     if page == -1:
@@ -163,7 +176,7 @@ def edit(id):
         post.body = form.body.data
         db.session.add(post)
         Tag.process_tag(post, form.tag.data)
-        flash('The post has been updated.', 'success')
+        flash(_('The post has been updated.'), 'success')
         return redirect(url_for('.post', id=post.id))
     form.title.data = post.title
     form.tag.data = ', '.join([tag.name for tag in post.tags.all()])
@@ -179,13 +192,13 @@ def follow(username):
     '''关注用户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.', 'danger')
+        flash(_('Invalid user.'), 'danger')
         return redirect(url_for('.index'))
     if current_user.is_following(user):
-        flash('You are already following this user.', 'warning')
+        flash(_('You are already following this user.'), 'warning')
         return redirect(url_for('.user', username=username))
     current_user.follow(user)
-    flash('You are now following %s.' % username, 'success')
+    flash(_('You are now following %(username)s.', username=username), 'success')
     return redirect(url_for('.user', username=username))
 
 
@@ -196,13 +209,13 @@ def unfollow(username):
     '''取消关注用户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.', 'danger')
+        flash(_('Invalid user.'), 'danger')
         return redirect(url_for('.index'))
     if not current_user.is_following(user):
-        flash('You are not following this user.', 'warning')
+        flash(_('You are not following this user.'), 'warning')
         return redirect(url_for('.user', username=username))
     current_user.unfollow(user)
-    flash('You are not following %s anymore.' % username, 'success')
+    flash(_('You are not following %(username)s anymore.', username=username), 'success')
     return redirect(url_for('.user', username=username))
 
 
@@ -211,7 +224,7 @@ def followers(username):
     '''关注者视图, 关注该用户的账户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.', 'danger')
+        flash(_('Invalid user.'), 'danger')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followers.paginate(
@@ -229,7 +242,7 @@ def followed_by(username):
     '''被关注者视图, 该用户关注的账户'''
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.', 'danger')
+        flash(_('Invalid user.'), 'danger')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followed.paginate(
@@ -355,13 +368,13 @@ def add_favorite(id):
     '''收藏文章'''
     post = Post.query.filter_by(id=id).first()
     if post is None:
-        flash('Invalid post.', 'danger')
+        flash(_('Invalid post.'), 'danger')
         return redirect(url_for('.index'))
     if current_user.is_favorite(post):
-        flash('You are already favorite this post.', 'warning')
+        flash(_('You are already favorite this post.'), 'warning')
         return redirect(url_for('.user', username=current_user.username))
     current_user.add_favorite(post)
-    flash('You are now favorite <%s>.' % post.title, 'success')
+    flash(_('You are now favorite <%(post)s>.', post=post.title), 'success')
     return redirect(url_for('.user', username=current_user.username))
 
 
@@ -371,13 +384,13 @@ def del_favorite(id):
     '''取消收藏'''
     post = Post.query.filter_by(id=id).first()
     if post is None:
-        flash('Invalid post.', 'danger')
+        flash(_('Invalid post.'), 'danger')
         return redirect(url_for('.index'))
     if not current_user.is_favorite(post):
-        flash('You are not favorite this post.', 'warning')
+        flash(_('You are not favorite this post.'), 'warning')
         return redirect(url_for('.user', username=current_user.username))
     current_user.del_favorite(post)
-    flash('You are not favorite <%s> anymore.' % post.title, 'success')
+    flash(_('You are not favorite <%(post)s> anymore.', post=post.title), 'success')
     return redirect(url_for('.user', username=current_user.username))
 
 
@@ -440,7 +453,7 @@ def get_rpm_task(id):
                           author=current_user._get_current_object())
         package.set_karma(form.body.data)
         db.session.add(comment)
-        flash('Your comment has been published.', 'success')
+        flash(_('Your comment has been published.'), 'success')
         return redirect(url_for('.get_rpm_task', id=package.task_id, page=-1))
     page = request.args.get('page', 1, type=int)
     if page == -1:
