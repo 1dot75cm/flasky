@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from flask_babel import gettext as _
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
-from .. import db
+from .. import db, cache
 from ..models import Permission, Role, User, Post, Comment, Tag, Category,\
     BlogView, Chrome, Package, Release
 from ..decorators import admin_required, permission_required
@@ -30,6 +30,7 @@ def set_locale(lang):
 
 
 @main.route('/', methods=['GET', 'POST'])
+@cache.memoize(timeout=600)
 def index():
     '''主页视图函数'''
     form = PostForm()
@@ -64,6 +65,7 @@ def index():
 
 
 @main.route('/user/<username>')
+@cache.memoize(timeout=600)
 def user(username):
     '''用户页视图函数'''
     user = User.query.filter_by(username=username).first_or_404()
@@ -78,6 +80,7 @@ def user(username):
 
 
 @main.route('/user/<username>/favorites')
+@cache.memoize(timeout=1800)
 def get_favorite_posts(username):
     '''用户收藏页视图'''
     user = User.query.filter_by(username=username).first_or_404()
@@ -137,6 +140,7 @@ def edit_profile_admin(id):
 
 
 @main.route('/post/<int:id>', methods=['GET', 'POST'])
+@cache.memoize(timeout=600)
 def post(id):
     '''文章页视图函数'''
     post = Post.query.get_or_404(id)
@@ -220,6 +224,7 @@ def unfollow(username):
 
 
 @main.route('/followers/<username>')
+@cache.memoize(timeout=1800)
 def followers(username):
     '''关注者视图, 关注该用户的账户'''
     user = User.query.filter_by(username=username).first()
@@ -238,6 +243,7 @@ def followers(username):
 
 
 @main.route('/followed-by/<username>')
+@cache.memoize(timeout=1800)
 def followed_by(username):
     '''被关注者视图, 该用户关注的账户'''
     user = User.query.filter_by(username=username).first()
@@ -275,6 +281,7 @@ def show_followed():
 
 @main.route('/moderate')
 @login_required
+@cache.memoize(timeout=60)
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate():
     '''管理评论视图'''
@@ -313,6 +320,7 @@ def moderate_disable(id):
 
 @main.route('/tags')
 @main.route('/tags/<int:id>')
+@cache.memoize(timeout=600)
 def get_tag(id=None):
     '''标签相关文章'''
     tags = Tag.query.all()
@@ -332,6 +340,7 @@ def get_tag(id=None):
 
 @main.route('/categories')
 @main.route('/categories/<int:id>')
+@cache.memoize(timeout=600)
 def get_category(id=None):
     '''分类相关文章'''
     categories = Category.query.all()
@@ -350,6 +359,7 @@ def get_category(id=None):
 
 
 @main.route('/favorites/<int:id>')
+@cache.memoize(timeout=600)
 def get_favorite_users(id):
     '''收藏文章的用户'''
     post = Post.query.filter_by(id=id).first()
@@ -395,6 +405,7 @@ def del_favorite(id):
 
 
 @main.route('/tools/chrome')
+@cache.memoize(timeout=600)
 def get_chrome():
     '''获取chrome版本'''
     platform = ['win', 'mac', 'linux']
@@ -421,6 +432,7 @@ def get_chrome():
 
 
 @main.route('/tools/updates/')
+@cache.memoize(timeout=60)
 def get_rpm_items():
     '''RPM包列表视图'''
     page = request.args.get('page', 1, type=int)
@@ -443,6 +455,7 @@ def get_rpm_items():
 
 
 @main.route('/tools/updates/<id>', methods=['GET', 'POST'])
+@cache.memoize(timeout=60)
 def get_rpm_task(id):
     '''RPM包视图'''
     package = Package.query.filter_by(task_id=id).first_or_404()

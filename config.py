@@ -87,6 +87,20 @@ class Config:
     BABEL_DEFAULT_TIMEZONE = 'UTC'
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
 
+    # Cache
+    CACHE_TYPE = 'null'  # null, simple, memcached, redis, filesystem
+    CACHE_DEFAULT_TIMEOUT = 600  # 缓存超时
+    CACHE_THRESHOLD = 1000  # 最大缓存条数
+
+    # Cache for redis
+    #CACHE_TYPE = 'redis'
+    #CACHE_KEY_PREFIX = 'flasky'  # 在键之前添加前缀, 区分不同应用程序
+    #CACHE_REDIS_URL = 'redis://user:password@localhost:6379/2'
+    #CACHE_REDIS_HOST = 'localhost'
+    #CACHE_REDIS_PORT = 6379
+    #CACHE_REDIS_PASSWORD = 'password'
+    #CACHE_REDIS_DB = 0  # db库
+
     @staticmethod
     def init_app(app):
         '''初始化app'''

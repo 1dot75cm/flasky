@@ -2,10 +2,12 @@
 import time
 from flask import jsonify, request, abort
 from ..models import Chrome
+from .. import cache
 from . import api
 
 
 @api.route('/chrome')
+@cache.memoize(timeout=600)
 def get_chrome():
     '''获取chrome版本'''
     platform = ['win', 'mac', 'linux']

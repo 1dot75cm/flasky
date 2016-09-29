@@ -1,12 +1,13 @@
 # coding: utf-8
 from flask import jsonify, request, g, url_for, current_app
-from .. import db
+from .. import db, cache
 from ..models import Post, Permission, Comment
 from . import api
 from .decorators import permission_required
 
 
 @api.route('/comments/')
+@cache.memoize(timeout=600)
 def get_comments():
     '''获取评论列表'''
     page = request.args.get('page', 1, type=int)
@@ -29,6 +30,7 @@ def get_comments():
 
 
 @api.route('/comments/<int:id>')
+@cache.memoize(timeout=600)
 def get_comment(id):
     '''获取评论'''
     comment = Comment.query.get_or_404(id)
@@ -36,6 +38,7 @@ def get_comment(id):
 
 
 @api.route('/posts/<int:id>/comments/')
+@cache.memoize(timeout=600)
 def get_post_comments(id):
     '''获取文章的评论列表'''
     post = Post.query.get_or_404(id)

@@ -1,6 +1,6 @@
 # coding: utf-8
 from flask import jsonify, request, g, abort, url_for, current_app
-from .. import db
+from .. import db, cache
 from ..models import Post, Permission
 from . import api
 from .decorators import permission_required
@@ -8,6 +8,7 @@ from .errors import forbidden
 
 
 @api.route('/posts/')
+@cache.memoize(timeout=600)
 def get_posts():
     '''获取文章列表'''
     page = request.args.get('page', 1, type=int)
@@ -30,6 +31,7 @@ def get_posts():
 
 
 @api.route('/posts/<int:id>')
+@cache.memoize(timeout=600)
 def get_post(id):
     '''获取文章'''
     post = Post.query.get_or_404(id)

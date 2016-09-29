@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 from flask import Flask, request, session
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
@@ -9,6 +10,7 @@ from flask_pagedown import PageDown
 from flask_oauthlib.client import OAuth
 from flask_fas_openid import FAS
 from flask_babel import Babel, lazy_gettext
+from flask_cache import Cache
 from sqlalchemy import MetaData
 from config import config
 
@@ -30,6 +32,7 @@ pagedown = PageDown()
 oauth = OAuth()
 fas = FAS(Flask(__name__))
 babel = Babel()
+cache = Cache()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'  # 会话安全等级
@@ -54,6 +57,7 @@ def create_app(config_name):
     oauth.init_app(app)
     fas.__init__(app)
     babel.init_app(app)
+    cache.init_app(app)
 
     # 附加路由和错误页面, 在蓝图中定义
     from .main import main as main_blueprint
@@ -73,5 +77,24 @@ def create_app(config_name):
             return session['locale']
         return request.accept_languages.best_match(
             app.config['LANGUAGES'].keys())
+
+    # https://gist.github.com/Ostrovski/f16779933ceee3a9d181
+    @app.url_defaults  # 所有视图的回调函数, 用于渲染前处理 url
+    def hashed_static_file(endpoint, values):
+        '''为静态文件添加参数, 用于更新缓存'''
+        if 'static' == endpoint or endpoint.endswith('.static'):
+            filename = values.get('filename')
+            if filename:
+                blueprint = request.blueprint
+                if '.' in endpoint:  # blueprint
+                    blueprint = endpoint.rsplit('.', 1)[0]
+
+                static_folder = app.static_folder
+                if blueprint and app.blueprints[blueprint].static_folder:
+                    static_folder = app.blueprints[blueprint].static_folder
+
+                fp = os.path.join(static_folder, filename)
+                if os.path.exists(fp):
+                    values['_'] = int(os.stat(fp).st_mtime)  # 文件修改时间
 
     return app
