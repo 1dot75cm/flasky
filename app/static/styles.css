@@ -94,6 +94,34 @@ div.post-control {
     text-align: right;
 }
 
+div.qrcode {
+    position: fixed;
+    display: none;
+    border: 1px solid #aaa;
+    z-index: 99;
+}
+
+div.qrcode-sm {
+    float: left;
+    width: 50px;
+    padding-left: 60px;
+    margin-left: -60px;
+    transform: skew(-50deg, 0deg);
+    -ms-transform: skew(-50deg, 0deg); /* IE 9 */
+    -moz-transform: skew(-50deg, 0deg); /* Firefox */
+    -webkit-transform: skew(-50deg, 0deg); /* Safari and Chrome */
+    -o-transform: skew(-50deg, 0deg); /* Opera */
+    overflow: hidden;
+}
+
+div.qrcode-sm img {
+    transform: skew(50deg, 0deg);
+    -ms-transform: skew(50deg, 0deg); /* IE 9 */
+    -moz-transform: skew(50deg, 0deg); /* Firefox */
+    -webkit-transform: skew(50deg, 0deg); /* Safari and Chrome */
+    -o-transform: skew(50deg, 0deg); /* Opera */
+}
+
 div.post-title {
     margin-bottom: 10px;
     text-align: center;

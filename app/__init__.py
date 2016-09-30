@@ -11,6 +11,8 @@ from flask_oauthlib.client import OAuth
 from flask_fas_openid import FAS
 from flask_babel import Babel, lazy_gettext
 from flask_cache import Cache
+from flask_qrcode import QRcode
+from qrcodex import QRcodeEx
 from sqlalchemy import MetaData
 from config import config
 
@@ -33,6 +35,7 @@ oauth = OAuth()
 fas = FAS(Flask(__name__))
 babel = Babel()
 cache = Cache()
+qrcode = QRcodeEx()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'  # 会话安全等级
@@ -58,6 +61,7 @@ def create_app(config_name):
     fas.__init__(app)
     babel.init_app(app)
     cache.init_app(app)
+    qrcode.init_app(app)
 
     # 附加路由和错误页面, 在蓝图中定义
     from .main import main as main_blueprint

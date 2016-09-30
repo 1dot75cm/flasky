@@ -101,6 +101,20 @@ var sideBar = function () {
     }
 }
 
+/* QR Code Image */
+var QRCode = function(event) {
+    event.stopPropagation();  // 取消事件冒泡, 不向父辈元素传递事件
+    let n = $(".qrcode-sm").index(this);  // 当前元素序号
+    let width = ($(window).width() - $(".qrcode").first().width()) / 2;
+    let height = ($(window).height() - $(".qrcode").first().height()) / 2;
+    $(".qrcode:not(:eq("+n+")):visible").hide();  // 隐藏除当前元素外的可见元素
+    $(".qrcode").eq(n).css({right: width, top: height}).toggle(200);
+}
+$(".qrcode-sm").on("click", QRCode);  // 移动端绑定 touchend 事件
+$(".qrcode").click(function() { $(this).fadeOut(500); });  // 淡出
+$(document).click(function() { $(".qrcode").slideUp(); }); // 滑动
+
+
 $(function() {
     timeTitle();
     mobileBar();
