@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # coding: utf-8
 import os
+import shutil
 from app import create_app, db
 from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
     Category, BlogView, OAuth, OAuthType, Chrome, Package, Release
@@ -133,6 +134,15 @@ def tran_compile():
     '''Generate binary message catalog (mo file).'''
     pybabel = 'venv/bin/pybabel'
     os.system(pybabel + ' compile -d app/translations')  # 生成 mo 文件
+
+
+@manager.command
+def build_index():
+    '''Create whoosh index.'''
+    import flask_whooshalchemyplus as whooshalchemy
+    if os.path.exists(app.config['WHOOSH_BASE']):
+        shutil.rmtree(app.config['WHOOSH_BASE'])
+    whooshalchemy.index_all(app)
 
 
 if __name__ == '__main__':

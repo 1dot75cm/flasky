@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.0\n"
 "Report-Msgid-Bugs-To: sensor.wen@gmail.com\n"
-"POT-Creation-Date: 2016-09-29 16:16+0800\n"
+"POT-Creation-Date: 2016-10-03 20:37+0800\n"
 "PO-Revision-Date: 2016-09-28 01:28+0800\n"
 "Last-Translator: 1dot75cm <sensor.wen@gmail.com>\n"
 "Language: zh_Hans\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: app/__init__.py:37
+#: app/__init__.py:43
 msgid "Please log in to access this page."
 msgstr "您需要登陆才能访问该页面。"
 
@@ -35,7 +35,7 @@ msgstr "密码"
 msgid "Keep me logged in"
 msgstr "记住我"
 
-#: app/auth/forms.py:15 app/templates/base.html:62
+#: app/auth/forms.py:15 app/templates/base.html:74
 msgid "Log In"
 msgstr "登陆"
 
@@ -101,7 +101,7 @@ msgstr "更新邮箱地址"
 
 #: app/auth/oauth.py:49 app/auth/oauth.py:53 app/auth/oauth.py:82
 #: app/auth/oauth.py:87 app/auth/oauth.py:118 app/auth/oauth.py:123
-#: app/auth/views.py:41
+#: app/auth/views.py:42
 #, python-format
 msgid "Hello, %(username)s."
 msgstr "您好，%(username)s。"
@@ -110,65 +110,65 @@ msgstr "您好，%(username)s。"
 msgid "Access denied."
 msgstr "拒绝访问。"
 
-#: app/auth/views.py:43
+#: app/auth/views.py:44
 msgid "Invalid username or password."
 msgstr "无效的用户名或密码。"
 
-#: app/auth/views.py:55
+#: app/auth/views.py:56
 msgid "You have been logged out."
 msgstr "您已成功登出。"
 
-#: app/auth/views.py:73
+#: app/auth/views.py:74
 msgid "A confirmation email has been sent to you by email."
 msgstr "已向您的邮箱发送了一封确认邮件。"
 
-#: app/auth/views.py:85
+#: app/auth/views.py:86
 msgid "You have confirmed your account. Thanks!"
 msgstr "您的账户已成功通过验证。"
 
-#: app/auth/views.py:87
+#: app/auth/views.py:88
 msgid "The confirmation link is invalid or has expired."
 msgstr "确认链接无效或已过期。"
 
-#: app/auth/views.py:98
+#: app/auth/views.py:99
 msgid "A new confirmation email has been sent to you by email."
 msgstr "已向您的邮箱重新发送了一封确认邮件。"
 
-#: app/auth/views.py:111 app/auth/views.py:151
+#: app/auth/views.py:112 app/auth/views.py:152
 msgid "Your password has been updated."
 msgstr "密码已更新。"
 
-#: app/auth/views.py:114
+#: app/auth/views.py:115
 msgid "Invalid password."
 msgstr "无效的密码。"
 
-#: app/auth/views.py:132
+#: app/auth/views.py:133
 msgid "An email with instructions to reset your password has been sent to you."
 msgstr "已发送重置密码邮件。"
 
-#: app/auth/views.py:136
+#: app/auth/views.py:137
 msgid "Email address is unknown."
 msgstr "邮件地址未知。"
 
-#: app/auth/views.py:153
+#: app/auth/views.py:154
 msgid "Your password has been update failed."
 msgstr "密码修改失败。"
 
-#: app/auth/views.py:170
+#: app/auth/views.py:171
 msgid ""
 "An email with instructions to confirm your new email address has been "
 "sent to you."
 msgstr "已向您的新邮箱发送了确认邮件。"
 
-#: app/auth/views.py:174
+#: app/auth/views.py:175
 msgid "Invalid email or password."
 msgstr "无效的邮箱或密码。"
 
-#: app/auth/views.py:183
+#: app/auth/views.py:184
 msgid "Your email address has been updated."
 msgstr "邮箱已更新。"
 
-#: app/auth/views.py:185
+#: app/auth/views.py:186
 msgid "Invalid request."
 msgstr "无效的请求。"
 
@@ -221,75 +221,75 @@ msgstr "您有什么新鲜事？"
 msgid "Enter your comment"
 msgstr "输入您的评论"
 
-#: app/main/views.py:25
+#: app/main/views.py:42
 msgid "Your current locale has been updated."
 msgstr "已成功切换语言。"
 
-#: app/main/views.py:28
+#: app/main/views.py:45
 msgid "Invalid language code."
 msgstr "无效的语言代码。"
 
-#: app/main/views.py:47
+#: app/main/views.py:65
 msgid "Your article has been updated."
 msgstr "文章已成功发布。"
 
-#: app/main/views.py:103
+#: app/main/views.py:123
 msgid "Your profile has been updated."
 msgstr "个人资料已成功更新。"
 
-#: app/main/views.py:127
+#: app/main/views.py:147
 msgid "The profile has been updated."
 msgstr "个人资料已成功更新。"
 
-#: app/main/views.py:150 app/main/views.py:456
+#: app/main/views.py:171 app/main/views.py:486
 msgid "Your comment has been published."
 msgstr "评论发布成功。"
 
-#: app/main/views.py:179
+#: app/main/views.py:200
 msgid "The post has been updated."
 msgstr "文章已成功更新。"
 
-#: app/main/views.py:195 app/main/views.py:212 app/main/views.py:227
-#: app/main/views.py:245
+#: app/main/views.py:216 app/main/views.py:233 app/main/views.py:249
+#: app/main/views.py:268
 msgid "Invalid user."
 msgstr "无效的用户。"
 
-#: app/main/views.py:198
+#: app/main/views.py:219
 msgid "You are already following this user."
 msgstr "您已关注该用户。"
 
-#: app/main/views.py:201
+#: app/main/views.py:222
 #, python-format
 msgid "You are now following %(username)s."
 msgstr "成功关注用户 %(username)s。"
 
-#: app/main/views.py:215
+#: app/main/views.py:236
 msgid "You are not following this user."
 msgstr "您未关注该用户。"
 
-#: app/main/views.py:218
+#: app/main/views.py:239
 #, python-format
 msgid "You are not following %(username)s anymore."
 msgstr "您已取消关注用户 %(username)s。"
 
-#: app/main/views.py:371 app/main/views.py:387
+#: app/main/views.py:398 app/main/views.py:414
 msgid "Invalid post."
 msgstr "无效的文章。"
 
-#: app/main/views.py:374
+#: app/main/views.py:401
 msgid "You are already favorite this post."
 msgstr "您已收藏该文章。"
 
-#: app/main/views.py:377
+#: app/main/views.py:404
 #, python-format
 msgid "You are now favorite <%(post)s>."
 msgstr "收藏文章 《%(post)s》 成功。"
 
-#: app/main/views.py:390
+#: app/main/views.py:417
 msgid "You are not favorite this post."
 msgstr "您未收藏该文章。"
 
-#: app/main/views.py:393
+#: app/main/views.py:420
 #, python-format
 msgid "You are not favorite <%(post)s> anymore."
 msgstr "您已取消收藏文章 《%(post)s》。"
@@ -322,38 +322,38 @@ msgstr "禁用"
 msgid "Permalink"
 msgstr "链接"
 
-#: app/templates/_posts.html:11
+#: app/templates/_posts.html:20
 msgid "Edit"
 msgstr "编辑"
 
-#: app/templates/_posts.html:17
+#: app/templates/_posts.html:26
 msgid "Edit [Admin]"
 msgstr "编辑 [管理员]"
 
-#: app/templates/_posts.html:22
+#: app/templates/_posts.html:31
 msgid "unfavorite"
 msgstr "取消收藏"
 
-#: app/templates/_posts.html:26
+#: app/templates/_posts.html:35
 msgid "favorite"
 msgstr "收藏"
 
-#: app/templates/_posts.html:57
+#: app/templates/_posts.html:66
 #, python-format
 msgid "%(count)s Views"
 msgstr "%(count)s 浏览"
 
-#: app/templates/_posts.html:60
+#: app/templates/_posts.html:69
 #, python-format
 msgid "%(count)s Favorites"
 msgstr "%(count)s 收藏"
 
-#: app/templates/_posts.html:63
+#: app/templates/_posts.html:72
 #, python-format
 msgid "%(count)s Comments"
 msgstr "%(count)s 评论"
 
-#: app/templates/_posts.html:76
+#: app/templates/_posts.html:85
 msgid "Tag:"
 msgstr "标签："
 
@@ -390,47 +390,51 @@ msgstr "获取 Chrome"
 msgid "RPM Update System"
 msgstr "RPM 更新系统"
 
-#: app/templates/base.html:50
+#: app/templates/base.html:47
+msgid "Search article"
+msgstr "搜索文章"
+
+#: app/templates/base.html:62
 msgid "Profile"
 msgstr "个人资料"
 
-#: app/templates/base.html:53
+#: app/templates/base.html:65
 msgid "Moderate Comments"
 msgstr "管理评论"
 
-#: app/templates/base.html:55
+#: app/templates/base.html:67
 msgid "Change Password"
 msgstr "修改密码"
 
-#: app/templates/base.html:56
+#: app/templates/base.html:68
 msgid "Change Email"
 msgstr "修改邮箱"
 
-#: app/templates/base.html:57
+#: app/templates/base.html:69
 msgid "Log Out"
 msgstr "退出登陆"
 
-#: app/templates/base.html:61
+#: app/templates/base.html:73
 msgid "Sign Up"
 msgstr "注册"
 
-#: app/templates/base.html:87
+#: app/templates/base.html:99
 msgid "Blog Statistics"
 msgstr "博客统计"
 
-#: app/templates/base.html:88
+#: app/templates/base.html:100
 msgid "Views:"
 msgstr "访问量："
 
-#: app/templates/base.html:90
+#: app/templates/base.html:102
 msgid "Articles:"
 msgstr "文章数："
 
-#: app/templates/base.html:91
+#: app/templates/base.html:103
 msgid "Comments:"
 msgstr "评论数："
 
-#: app/templates/base.html:105
+#: app/templates/base.html:117
 msgid "Language"
 msgstr "语言"
 
@@ -567,6 +571,11 @@ msgstr "提交时间"
 #, python-format
 msgid "You need to <a href=\"%(url)s\">click here</a> to login for comment."
 msgstr "您需要<a href=\"%(url)s\">访问这里</a>进行登陆, 才能进行评论。"
+
+#: app/templates/search.html:7
+#, python-format
+msgid "Search results for \"%(query)s\":"
+msgstr "\"%(query)s\" 搜索结果："
 
 #: app/templates/tags.html:18
 #, python-format

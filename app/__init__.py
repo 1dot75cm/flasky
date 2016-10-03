@@ -1,5 +1,6 @@
 # coding: utf-8
 import os
+import flask_whooshalchemyplus as whooshalchemy
 from flask import Flask, request, session
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
@@ -62,6 +63,7 @@ def create_app(config_name):
     babel.init_app(app)
     cache.init_app(app)
     qrcode.init_app(app)
+    whooshalchemy.init_app(app)  # 创建全文索引
 
     # 附加路由和错误页面, 在蓝图中定义
     from .main import main as main_blueprint

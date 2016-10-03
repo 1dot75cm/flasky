@@ -1,10 +1,10 @@
 # coding: utf-8
 from flask import render_template, redirect, url_for, abort, flash, request,\
-    current_app, make_response, session
+    current_app, make_response, session, g
 from flask_login import login_required, current_user
 from flask_babel import gettext as _
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, SearchForm
 from .. import db, cache
 from ..models import Permission, Role, User, Post, Comment, Tag, Category,\
     BlogView, Chrome, Package, Release
@@ -15,6 +15,23 @@ from ..decorators import admin_required, permission_required
 def before_request():
     '''记录访问信息'''
     BlogView.add_view()
+    g.search_form = SearchForm()  # 表单类全局可用
+
+
+@main.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    '''搜索页面'''
+    query = g.search_form.search.data or request.args.get('query', None)
+    if g.search_form.validate_on_submit():
+        session['allow_search'] = True  # 不允许直接用 GET 搜索
+        return redirect(url_for('.search', query=query))
+    if query and session.get('allow_search'):
+        session['allow_search'] = False
+        posts = Post.query.whoosh_search(query,
+            current_app.config['MAX_SEARCH_RESULTS']).all()
+        return render_template('search.html', query=query, posts=posts)
+    return redirect(url_for('.index'))
 
 
 @main.route('/locale/<lang>')

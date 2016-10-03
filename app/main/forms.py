@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask_wtf import Form
+from flask_wtf import FlaskForm as Form
 from wtforms import StringField, TextAreaField, BooleanField, SelectField, SubmitField
 from wtforms.validators import Required, Length, Email, Regexp
 from wtforms import ValidationError
@@ -75,3 +75,8 @@ class CommentForm(Form):
     '''评论表单'''
     body = TextAreaField(_('Enter your comment'), validators=[Required()])
     submit = SubmitField(_('Submit'))
+
+
+class SearchForm(Form):
+    '''搜索表单'''
+    search = StringField('Search', validators=[Required(), Length(0, 64)])

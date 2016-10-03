@@ -1,4 +1,5 @@
 # coding: utf-8
+from whoosh.analysis import StemmingAnalyzer
 import os
 basedir = os.path.abspath(os.getcwd())
 datadir = os.path.join(basedir, 'data')
@@ -31,6 +32,8 @@ class Config:
     # you must do this for yourself to use the wtf, more about this, you can
     # take a reference to the book <<Flask Framework Cookbook>>.
     # But the book only have the version of English.
+    MAX_SEARCH_RESULTS = 50  # 搜索结果的最大数量
+    WHOOSH_ANALYZER = StemmingAnalyzer()  # 全局默认分析器
     DEFAULT_OAUTHS = ['github', 'google', 'fedora']
 
     # GitHub OAuth2
@@ -112,6 +115,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    WHOOSH_BASE = os.getenv('DEV_WHOOSH_INDEX_DIR') or \
+        os.path.join(basedir, 'search-dev.index')
 
 
 class TestingConfig(Config):
@@ -119,12 +124,16 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
+    WHOOSH_BASE = os.getenv('TEST_WHOOSH_INDEX_DIR') or \
+        os.path.join(basedir, 'search-test.index')
 
 
 class ProductionConfig(Config):
     '''生产环境配置'''
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    WHOOSH_BASE = os.getenv('WHOOSH_INDEX_DIR') or \
+        os.path.join(basedir, 'search.index')
 
 
 config = {

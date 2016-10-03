@@ -18,6 +18,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin, current_user
+from jieba.analyse import ChineseAnalyzer
 from app.exceptions import ValidationError
 from dnf.exceptions import RepoError
 from commands import getoutput
@@ -377,6 +378,8 @@ favorite_relationship = db.Table('favorite_relationship',
 class Post(db.Model):
     '''posts表模型'''
     __tablename__ = 'posts'
+    __searchable__ = ['title', 'body']  # 需要建立全文索引的字段
+    __analyzer__ = ChineseAnalyzer()  # 中文分词
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), index=True)
     body = db.Column(db.Text)
