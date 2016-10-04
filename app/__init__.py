@@ -13,6 +13,7 @@ from flask_fas_openid import FAS
 from flask_babel import Babel, lazy_gettext
 from flask_cache import Cache
 from flask_cachecontrol import FlaskCacheControl
+from flask_compress import Compress
 from flask_qrcode import QRcode
 from qrcodex import QRcodeEx
 from sqlalchemy import MetaData
@@ -38,6 +39,7 @@ fas = FAS(Flask(__name__))
 babel = Babel()
 cache = Cache()
 cache_control = FlaskCacheControl()
+compress = Compress()
 qrcode = QRcodeEx()
 
 login_manager = LoginManager()
@@ -65,6 +67,7 @@ def create_app(config_name):
     babel.init_app(app)
     cache.init_app(app)
     cache_control.init_app(app)
+    compress.init_app(app)
     qrcode.init_app(app)
     whooshalchemy.init_app(app)  # 创建全文索引
 

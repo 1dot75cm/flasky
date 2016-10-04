@@ -104,6 +104,9 @@ class Config:
     #CACHE_REDIS_PASSWORD = 'password'
     #CACHE_REDIS_DB = 0  # db库
 
+    COMPRESS_LEVEL = 6  # Gzip 压缩级别
+    COMPRESS_MIN_SIZE = 500  # 最小压缩大小
+
     @staticmethod
     def init_app(app):
         '''初始化app'''
