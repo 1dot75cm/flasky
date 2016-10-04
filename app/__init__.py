@@ -12,6 +12,7 @@ from flask_oauthlib.client import OAuth
 from flask_fas_openid import FAS
 from flask_babel import Babel, lazy_gettext
 from flask_cache import Cache
+from flask_cachecontrol import FlaskCacheControl
 from flask_qrcode import QRcode
 from qrcodex import QRcodeEx
 from sqlalchemy import MetaData
@@ -36,6 +37,7 @@ oauth = OAuth()
 fas = FAS(Flask(__name__))
 babel = Babel()
 cache = Cache()
+cache_control = FlaskCacheControl()
 qrcode = QRcodeEx()
 
 login_manager = LoginManager()
@@ -62,6 +64,7 @@ def create_app(config_name):
     fas.__init__(app)
     babel.init_app(app)
     cache.init_app(app)
+    cache_control.init_app(app)
     qrcode.init_app(app)
     whooshalchemy.init_app(app)  # 创建全文索引
 
