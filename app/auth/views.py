@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, g
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_babel import gettext as _
 from . import auth
-from .. import db, fas, cache
+from .. import db, fas, cache, cache_valid
 from ..models import User, OAuthType
 from ..email import send_email
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
@@ -22,7 +22,7 @@ def before_request():
 
 
 @auth.route('/unconfirmed')
-@cache.cached(timeout=1800)
+@cache.cached(timeout=1800, unless=cache_valid)
 def unconfirmed():
     '''未验证账户视图'''
     if current_user.is_anonymous or current_user.confirmed:

@@ -91,7 +91,7 @@ class Config:
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
 
     # Cache
-    CACHE_TYPE = 'null'  # null, simple, memcached, redis, filesystem
+    CACHE_TYPE = 'simple'  # null, simple, memcached, redis, filesystem
     CACHE_DEFAULT_TIMEOUT = 600  # 缓存超时
     CACHE_THRESHOLD = 1000  # 最大缓存条数
 

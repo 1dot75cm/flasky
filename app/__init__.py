@@ -103,4 +103,31 @@ def create_app(config_name):
                 if os.path.exists(fp):
                     values['_'] = int(os.stat(fp).st_mtime)  # 文件修改时间
 
+    @app.before_request
+    def before_request():
+        '''处理请求缓存'''
+        if request.method == 'POST':  # 使下次 GET 缓存失效
+            session['nocache'] = True
+
+    @app.after_request
+    def after_request(response):
+        '''请求后, 删除 nocache 使缓存生效'''
+        if request.method == 'GET' and request.endpoint != 'main.set_locale':  # 使 GET 缓存生效
+            session.get('nocache', None) and session.pop('nocache')
+        return response
+
     return app
+
+
+def cache_key(func_name):
+    '''缓存键回调'''
+    return request.remote_addr +'_'+ \
+           session.get('user_id', 'anonymous') +'_'+ \
+           func_name  # app.main.views.index
+
+
+def cache_valid():
+    '''缓存有效回调'''
+    if request.method == 'POST':  # 使 POST 缓存失效
+        return True
+    return session.get('nocache', None)
