@@ -139,4 +139,6 @@ $(function() {
             .attr("title", img.attr("alt"))
             .append(img).replaceAll($(this));
     });
+    /* 图片预览 */
+    baguetteBox.run(".post-body");
 });
