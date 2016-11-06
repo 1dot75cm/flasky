@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 from whoosh.analysis import StemmingAnalyzer
 import os
 basedir = os.path.abspath(os.getcwd())
@@ -71,7 +72,7 @@ class Config:
     DEFAULT_RELEASES = ['F22', 'F23', 'F24', 'F25']
     REPO_URL = 'https://repo.fdzh.org/FZUG'
     REPO_ARCH = ['x86_64', 'i386']
-    REPO_PATH = os.path.join(os.getenv('REPO_PATH'))
+    REPO_PATH = os.path.join(os.getenv('REPO_PATH') or '/tmp')
     REPO_TESTING_DIR = os.getenv('REPO_TESTING_DIR') or 'testing'
     REPO_STABLE_DIR = os.getenv('REPO_STABLE_DIR') or 'stable'
     PKG_DEADLINE = 3600 * 24 * os.getenv('PKG_DEADLINE', 2)

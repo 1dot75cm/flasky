@@ -1,7 +1,12 @@
 # coding: utf-8
+from __future__ import print_function
 import sys
-sys.path.append('/usr/lib/python2.7/site-packages')
-sys.path.append('/usr/lib64/python2.7/site-packages')
+[sys.path.append('/usr/%s/python%s.%s/site-packages' % (arch,
+    sys.version_info.major, sys.version_info.minor)) for arch in ('lib', 'lib64')]
+try:
+    from commands import getoutput
+except:
+    from subprocess import getoutput
 import os
 import re
 import dnf
@@ -21,7 +26,6 @@ from flask_login import UserMixin, AnonymousUserMixin, current_user
 from jieba.analyse import ChineseAnalyzer
 from app.exceptions import ValidationError
 from dnf.exceptions import RepoError
-from commands import getoutput
 from . import db, login_manager, chrome
 
 
@@ -892,7 +896,7 @@ class Package(db.Model):
                 try:
                     shutil.move(source, target)
                 except IOError as e:
-                    print e
+                    print(e)
             if not os.environ.get('IS_DAEMON', ''):
                 self.create_repo([spath, tpath])
         db.session.add(self)

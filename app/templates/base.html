@@ -120,7 +120,7 @@
         </button>
         <ul class="dropdown-menu" role="menu">
             {% for key, value in Language.items() %}
-            <li><a href="{{ url_for('main.set_locale', lang=key, next=request.url) }}">{{ value[0].decode('utf-8') }}</a></li>
+            <li><a href="{{ url_for('main.set_locale', lang=key, next=request.url) }}">{{ value[0] }}</a></li>
             {% endfor %}
         </ul>
     </div>

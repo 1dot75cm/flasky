@@ -2,7 +2,10 @@
 import os
 import base64
 from io import BytesIO
-from urllib import urlopen
+try:
+    from urllib import urlopen
+except:
+    from urllib.request import urlopen
 from PIL import Image
 import qrcode as qrc
 from flask_qrcode import QRcode
@@ -100,7 +103,7 @@ class QRcodeEx(QRcode):
         icon_w, icon_h = icon.size  # 小图标大小
         icon_w = size_w if icon_w > size_w else icon_w
         icon_h = size_h if icon_h > size_h else icon_h
-        icon = icon.resize((icon_w, icon_h), Image.ANTIALIAS)  # 调整小图标
+        icon = icon.resize((int(icon_w), int(icon_h)), Image.ANTIALIAS)  # 调整小图标
         icon = icon.convert('RGBA')  # 一些图片不具备 alpha 通道, 需要转换
 
         left = int((img_w - icon_w) / 2)
