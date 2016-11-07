@@ -5,6 +5,7 @@ import os
 basedir = os.path.abspath(os.getcwd())
 datadir = os.path.join(basedir, 'data')
 logdir  = os.path.join(datadir, 'logs')
+covdir  = os.path.join(datadir, 'coverage')
 
 
 class Config:

@@ -1,12 +1,20 @@
 #!/usr/bin/env python2
 # coding: utf-8
+from __future__ import print_function
 import os
 import shutil
+COV = None
+if os.getenv('FLASK_COVERAGE'):
+    import coverage
+    COV = coverage.coverage(branch=True, include='app/*')  # branch分支覆盖分析
+    COV.start()
+
 from app import create_app, db
 from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
     Category, BlogView, OAuth, OAuthType, Chrome, Package, Release
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
+from config import covdir
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 is_sqlite = app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite')
@@ -41,11 +49,25 @@ manager.add_command("db", MigrateCommand)
 
 
 @manager.command
-def test():
+def test(coverage=False):
     '''Run the unit tests.'''
+    if coverage and not os.getenv('FLASK_COVERAGE'):
+        import sys
+        os.putenv('FLASK_COVERAGE', '1')  # 设置环境变量
+        os.execvp(sys.executable, [sys.executable] + sys.argv)  # 重启脚本, 运行覆盖分析
+
     import unittest
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner(verbosity=2).run(tests)
+
+    if COV:
+        COV.stop()
+        COV.save()
+        print('\nCoverage Summary:')
+        COV.report()
+        COV.html_report(directory=covdir)
+        print('HTML version: file://%s/index.html' % covdir)
+        COV.erase()
 
 
 @manager.command
