@@ -16,26 +16,13 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from config import covdir
 
+
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 is_sqlite = app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite')
 manager = Manager(app)
 migrate = Migrate(app, db, render_as_batch=is_sqlite)
 # SQLite do not support ALTER, so add render_as_batch=True and naming convention
 # https://github.com/miguelgrinberg/Flask-Migrate/issues/61#issuecomment-208131722
-
-
-def string_split(string, split):
-    '''string to list filter'''
-    return string.split(split)
-
-# Global variables to jinja2 environment:
-app.jinja_env.globals['Post'] = Post
-app.jinja_env.globals['Comment'] = Comment
-app.jinja_env.globals['Tag'] = Tag
-app.jinja_env.globals['Category'] = Category
-app.jinja_env.globals['BlogView'] = BlogView
-app.jinja_env.globals['Language'] = app.config['LANGUAGES']
-app.jinja_env.filters['split'] = string_split
 
 
 def make_shell_context():

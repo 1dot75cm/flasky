@@ -6,14 +6,14 @@ from app import create_app, db
 
 class BasicsTestCase(unittest.TestCase):
     def setUp(self):
-        '''测试前运行, 初始化测试环境'''
+        '''在每个测试前运行, 初始化测试环境'''
         self.app = create_app('testing')
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
 
     def tearDown(self):
-        '''测试后运行, 清理测试环境'''
+        '''在每个测试后运行, 清理测试环境'''
         db.session.remove()
         db.drop_all()
         self.app_context.pop()

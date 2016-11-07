@@ -131,6 +131,7 @@ class TestingConfig(Config):
         'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
     WHOOSH_BASE = os.getenv('TEST_WHOOSH_INDEX_DIR') or \
         os.path.join(basedir, 'search-test.index')
+    WTF_CSRF_ENABLED = False  # 测试中禁用 CSRF 保护, 否则 POST 需要提交 CSRF Token
 
 
 class ProductionConfig(Config):

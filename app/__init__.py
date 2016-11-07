@@ -3,7 +3,24 @@ import os
 from flask import Flask, request, session
 from .ext import (bootstrap, mail, moment, db, login_manager, pagedown, oauth, fas,
     babel, cache, cache_control, compress, qrcode, whooshalchemy)
+from .models import Post, Comment, Category, Tag, BlogView
 from config import config
+
+
+def initial_template_variable(app):
+    '''初始化 Jinja2 模板变量'''
+    def string_split(string, split):
+        '''string to list filter'''
+        return string.split(split)
+
+    # Global variables to jinja2 environment
+    app.add_template_global(Post, 'Post')
+    app.add_template_global(Comment, 'Comment')
+    app.add_template_global(Tag, 'Tag')
+    app.add_template_global(Category, 'Category')
+    app.add_template_global(BlogView, 'BlogView')
+    app.add_template_global(app.config['LANGUAGES'], 'Language')
+    app.add_template_filter(string_split, 'split')
 
 
 def create_app(config_name):
@@ -13,6 +30,8 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     # 执行指定配置的初始化动作
     config[config_name].init_app(app)
+    # 初始化 Jinja2 模板变量
+    initial_template_variable(app)
 
     bootstrap.init_app(app)
     mail.init_app(app)
@@ -89,9 +108,11 @@ def create_app(config_name):
 
 def cache_key(func_name):
     '''缓存键回调'''
-    return request.remote_addr +'_'+ \
-           session.get('user_id', 'anonymous') +'_'+ \
-           func_name  # app.main.views.index
+    return '_'.join((
+        request.remote_addr or 'localhost',  # test_client 访问后无 remote_addr
+        session.get('user_id', 'anonymous'),
+        func_name  # app.main.views.index
+    ))
 
 
 def cache_valid():

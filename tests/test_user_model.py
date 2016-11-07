@@ -8,7 +8,7 @@ from app.models import User, AnonymousUser, Role, Permission, Follow
 
 class UserModelTestCase(unittest.TestCase):
     def setUp(self):
-        '''初始化测试环境'''
+        '''在每个测试前运行, 初始化测试环境'''
         self.app = create_app('testing')
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -16,7 +16,7 @@ class UserModelTestCase(unittest.TestCase):
         Role.insert_roles()
 
     def tearDown(self):
-        '''清理测试环境'''
+        '''在每个测试后运行, 清理测试环境'''
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
