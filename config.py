@@ -7,6 +7,7 @@ datadir = os.path.join(basedir, 'data')
 logdir  = os.path.join(datadir, 'logs')
 covdir  = os.path.join(datadir, 'coverage')
 bindir  = os.path.join(datadir, 'bin')
+prodir  = os.path.join(datadir, 'profile')
 
 
 class Config:

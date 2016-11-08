@@ -14,9 +14,10 @@ from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
     Category, BlogView, OAuth, OAuthType, Chrome, Package, Release
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
-from config import bindir, logdir, covdir
+from config import bindir, logdir, covdir, prodir
 
 
+make_dirs = lambda dir: os.makedirs(dir) if not os.path.exists(dir) else dir
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 is_sqlite = app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite')
 manager = Manager(app)
@@ -38,9 +39,7 @@ manager.add_command("db", MigrateCommand)
 @manager.command
 def test(coverage=False):
     '''Run the unit tests.'''
-    make_dirs = lambda dir: os.makedirs(dir) if not os.path.exists(dir) else dir
-    make_dirs(bindir)
-    make_dirs(logdir)
+    list(map(make_dirs, [bindir, logdir]))
 
     if coverage and not os.getenv('FLASK_COVERAGE'):
         import sys
@@ -59,6 +58,22 @@ def test(coverage=False):
         COV.html_report(directory=covdir)
         print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
+
+
+@manager.command
+def profile(length=15, profile_dir=None, output_type='-'):
+    '''Start the application under the code profiler.'''
+    # 记录调用的函数以及运行各函数所消耗的时间, 并生成报告
+    # length: 显示最慢的 15 个函数
+    # profile_dir: 保存分析数据的目录
+    if output_type == 'file':
+        make_dirs(prodir)
+        profile_dir = prodir
+
+    from werkzeug.contrib.profiler import ProfilerMiddleware
+    app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[length],
+                                      profile_dir=profile_dir)
+    app.run()
 
 
 @manager.command
