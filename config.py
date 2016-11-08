@@ -145,6 +145,34 @@ class ProductionConfig(Config):
     WHOOSH_BASE = os.getenv('WHOOSH_INDEX_DIR') or \
         os.path.join(basedir, 'search.index')
 
+    @classmethod
+    def init_app(cls, app):
+        '''配置 logging 将日志写入 email 日志记录器'''
+        # 把生产模式中出现的错误通过 email 发给 FLASKY_ADMIN
+        Config.init_app(app)
+
+        # email errors to the administrators
+        import logging
+        from logging.handlers import SMTPHandler
+        credentials = None
+        secure = None
+
+        if getattr(cls, 'MAIL_USERNAME', None) is not None:
+            credentials = (cls.MAIL_USERNAME, cls.MAIL_PASSWORD)
+            if getattr(cls, 'MAIL_USE_TLS', None):
+                secure = ()
+
+        mail_handler = SMTPHandler(
+            mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
+            fromaddr=cls.FLASKY_MAIL_SENDER,
+            toaddrs=[cls.FLASKY_ADMIN],
+            subject=cls.FLASKY_MAIL_SUBJECT_PREFIX + ' Application Error',
+            credentials=credentials,
+            secure=secure)
+        # 严重错误才发送邮件；通过添加其他日志处理程序，可以把日志写入文件或系统日志
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+
 
 config = {
     'development': DevelopmentConfig,
