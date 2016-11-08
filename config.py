@@ -13,6 +13,7 @@ class Config:
     '''通用配置'''
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True  # 请求结束后, 自动提交
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_RECORD_QUERIES = True  # 记录查询统计信息
     MAIL_SERVER = os.getenv('MAIL_SERVER') or 'smtp.googlemail.com'
     MAIL_PORT = os.getenv('MAIL_PORT') or 587
     MAIL_USE_TLS = True
@@ -25,6 +26,7 @@ class Config:
     FLASKY_PKGS_PER_PAGE = 25
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
+    FLASKY_SLOW_DB_QUERY_TIME = 0.5  # 慢查询阀值, 秒
     SECRET_KEY = os.getenv('SECRET_KEY') or 'secret_key_string'  # 用于加密 session 的密钥
     WTF_I18N_ENABLED = True
     WTF_CSRF_SECRET_KEY = 'random key for form' # for csrf protection

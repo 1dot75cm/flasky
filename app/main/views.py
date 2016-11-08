@@ -3,6 +3,7 @@ from flask import render_template, redirect, url_for, abort, flash, request,\
     current_app, make_response, session, g
 from flask_login import login_required, current_user
 from flask_babel import gettext as _
+from flask_sqlalchemy import get_debug_queries
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, SearchForm
 from .. import db, cache, cache_key, cache_valid
@@ -16,6 +17,18 @@ def before_request():
     '''记录访问信息'''
     BlogView.add_view()
     g.search_form = SearchForm()  # 表单类全局可用
+
+
+@main.after_app_request
+def after_request(response):
+    '''记录数据库慢查询'''
+    for query in get_debug_queries():  # 包含请求中执行的数据库查询相关的统计信息
+        if query.duration >= current_app.config['FLASKY_SLOW_DB_QUERY_TIME']:
+            # 若想保存日志, 必须配置日志记录器
+            current_app.logger.warning(
+                'Slow query: %s\nParameters: %s\nDuration: %fs\nContext: %s\n'
+                % (query.statement, query.parameters, query.duration, query.context))
+    return response
 
 
 @main.route('/shutdown')
