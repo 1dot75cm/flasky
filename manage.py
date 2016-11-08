@@ -9,6 +9,15 @@ if os.getenv('FLASK_COVERAGE'):
     COV = coverage.coverage(branch=True, include='app/*')  # branch分支覆盖分析
     COV.start()
 
+# 从 .env 导入环境变量
+if os.path.exists('.env'):
+    print('Importing environment from .env...')
+    with open('.env') as f:
+        for line in f.readlines():
+            var = line.strip().split('=')
+            if len(var) == 2:
+                os.putenv(var[0], var[1])
+
 from app import create_app, db
 from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
     Category, BlogView, OAuth, OAuthType, Chrome, Package, Release

@@ -208,11 +208,28 @@ class HerokuConfig(ProductionConfig):
         app.logger.addHandler(file_handler)
 
 
+class UnixConfig(ProductionConfig):
+    '''Linux 环境配置'''
+
+    @classmethod
+    def init_app(cls, app):
+        '''配置 logging 将日志写入 rsyslog'''
+        ProductionConfig.init_app(app)
+
+        # log to syslog
+        import logging
+        from logging.handlers import SysLogHandler
+        syslog_handler = SysLogHandler()
+        syslog_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(syslog_handler)
+
+
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
     'heroku': HerokuConfig,
+    'unix': UnixConfig,
 
     'default': DevelopmentConfig
 }
