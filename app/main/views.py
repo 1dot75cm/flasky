@@ -18,6 +18,18 @@ def before_request():
     g.search_form = SearchForm()  # 表单类全局可用
 
 
+@main.route('/shutdown')
+def server_shutdown():
+    '''关闭Web服务'''
+    if not current_app.testing:
+        abort(404)
+    shutdown = request.environ.get('werkzeug.server.shutdown')
+    if not shutdown:
+        abort(500)
+    shutdown()
+    return 'Shutting down...'
+
+
 @main.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():

@@ -14,7 +14,7 @@ from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
     Category, BlogView, OAuth, OAuthType, Chrome, Package, Release
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
-from config import covdir
+from config import bindir, logdir, covdir
 
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -38,6 +38,10 @@ manager.add_command("db", MigrateCommand)
 @manager.command
 def test(coverage=False):
     '''Run the unit tests.'''
+    make_dirs = lambda dir: os.makedirs(dir) if not os.path.exists(dir) else dir
+    make_dirs(bindir)
+    make_dirs(logdir)
+
     if coverage and not os.getenv('FLASK_COVERAGE'):
         import sys
         os.putenv('FLASK_COVERAGE', '1')  # 设置环境变量
