@@ -29,6 +29,7 @@ class Config:
     FLASKY_COMMENTS_PER_PAGE = 30
     FLASKY_SLOW_DB_QUERY_TIME = 0.5  # 慢查询阀值, 秒
     SECRET_KEY = os.getenv('SECRET_KEY') or 'secret_key_string'  # 用于加密 session 的密钥
+    SSL_DISABLE = False  # 启用 SSL, debug/testing 不生效
     WTF_I18N_ENABLED = True
     WTF_CSRF_SECRET_KEY = 'random key for form' # for csrf protection
     # https://github.com/xpleaf/Blog_mini/blob/master/config.py
@@ -174,10 +175,44 @@ class ProductionConfig(Config):
         app.logger.addHandler(mail_handler)
 
 
+class HerokuConfig(ProductionConfig):
+    '''Heroku 环境配置'''
+    SSL_DISABLE = bool(os.getenv('SSL_DISABLE'))
+
+    @classmethod
+    def init_app(cls, app):
+        '''配置 logging 将日志写入 stdout/stderr'''
+        # Heroku 中, 写入 stdout/stderr 的日志会被 Heroku 捕获, 用 heroku logs 命令查看
+        ProductionConfig.init_app(app)
+
+        # handle proxy server headers
+        # 做了以上改动后, 用户会强制使用 SSL。但还有一个细节需要处理才能完善该功能。
+        # 使用 Heroku 时, 客户端不直接连接托管的程序, 而是连接一个反向代理服务器,
+        # 然后再把请求重定向到程序。这种连接方式中, 只有代理服务器运行在 SSL 模式。
+        # 程序从代理服务器收到的请求都未使用 SSL, 因为内网无需使用高安全性的请求。
+        # 程序生成绝对 URL 时, 要和请求使用的安全连接一致, 这时就产生问题了, 使用
+        # 反向代理服务器时, request.is_secure 的值一直是 False。
+        #
+        # 代理服务器通过自定义 HTTP 头, 把客户端的原始请求传给后端 Web 服务器,
+        # 所以查看这些 HTTP 头就可以知道用户和程序通信时是否使用 SSL。Werkzeug
+        # 提供了一个 WSGI 中间件, 用来检查代理服务器发出的自定义头并对请求对象进行修改。
+        # 注意: 任何使用反向代理的部署环境都需要该中间件处理自定义 HTTP 头
+        from werkzeug.contrib.fixers import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
+        # log to stderr
+        import logging
+        from logging import StreamHandler
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.WARNING)  # 警告级别日志
+        app.logger.addHandler(file_handler)
+
+
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
+    'heroku': HerokuConfig,
 
     'default': DevelopmentConfig
 }

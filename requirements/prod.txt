@@ -2,3 +2,4 @@
 gunicorn==19.6.0
 uWSGI==2.0.13.1
 python-daemon==2.1.1
+Flask-SSLify==0.1.5
