@@ -124,27 +124,27 @@ class DevelopmentConfig(Config):
     '''开发环境配置'''
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+        'sqlite:///' + os.path.join(datadir, 'data-dev.sqlite')
     WHOOSH_BASE = os.getenv('DEV_WHOOSH_INDEX_DIR') or \
-        os.path.join(basedir, 'search-dev.index')
+        os.path.join(datadir, 'search-dev.index')
 
 
 class TestingConfig(Config):
     '''测试环境配置'''
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
+        'sqlite:///' + os.path.join(datadir, 'data-test.sqlite')
     WHOOSH_BASE = os.getenv('TEST_WHOOSH_INDEX_DIR') or \
-        os.path.join(basedir, 'search-test.index')
+        os.path.join(datadir, 'search-test.index')
     WTF_CSRF_ENABLED = False  # 测试中禁用 CSRF 保护, 否则 POST 需要提交 CSRF Token
 
 
 class ProductionConfig(Config):
     '''生产环境配置'''
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+        'sqlite:///' + os.path.join(datadir, 'data.sqlite')
     WHOOSH_BASE = os.getenv('WHOOSH_INDEX_DIR') or \
-        os.path.join(basedir, 'search.index')
+        os.path.join(datadir, 'search.index')
 
     @classmethod
     def init_app(cls, app):
