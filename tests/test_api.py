@@ -1,28 +1,28 @@
 # coding: utf-8
-import unittest
 import json
 import re
 from base64 import b64encode
 from flask import url_for
+from flask_testing import TestCase
 from app import create_app, db
 from app.models import User, Role, Post, Comment
 
 
-class APITestCase(unittest.TestCase):
+class APITestCase(TestCase):
+    def create_app(self):
+        '''创建 app'''
+        # 初始化时会创建 app_context, test_client, 并导入应用上下文
+        return create_app('testing')
+
     def setUp(self):
         '''在每个测试前运行, 初始化测试环境'''
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
         db.create_all()
         Role.insert_roles()
-        self.client = self.app.test_client()
 
     def tearDown(self):
         '''在每个测试后运行, 清理测试环境'''
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()
 
     def get_api_headers(self, username, password):
         '''获取所有请求都要发送的头'''

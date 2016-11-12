@@ -137,6 +137,7 @@ class TestingConfig(Config):
     WHOOSH_BASE = os.getenv('TEST_WHOOSH_INDEX_DIR') or \
         os.path.join(datadir, 'search-test.index')
     WTF_CSRF_ENABLED = False  # 测试中禁用 CSRF 保护, 否则 POST 需要提交 CSRF Token
+    CACHE_TYPE = 'null'
 
 
 class ProductionConfig(Config):

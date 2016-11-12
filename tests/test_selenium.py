@@ -3,9 +3,8 @@ from __future__ import print_function
 import os
 import re
 import time
-import threading
-import unittest
 from selenium import webdriver
+from flask_testing import LiveServerTestCase
 from app import create_app, db
 from app.models import Role, User, Post, Category
 from config import datadir, bindir, logdir
@@ -38,8 +37,12 @@ def download_webdriver():
     return fpath
 
 
-class SeleniumTestCase(unittest.TestCase):
+class SeleniumTestCase(LiveServerTestCase):
     client = None
+
+    def create_app(self):
+        '''创建 app'''
+        return create_app('testing')
 
     @classmethod
     def setUpClass(cls):
@@ -56,11 +59,6 @@ class SeleniumTestCase(unittest.TestCase):
 
         # 如果无法启动浏览器, 则跳过这些测试
         if cls.client:
-            # 创建应用程序
-            cls.app = create_app('testing')
-            cls.app_context = cls.app.app_context()
-            cls.app_context.push()
-
             # 禁止日志, 保持输出简洁
             import logging
             logger = logging.getLogger('werkzeug')
@@ -79,29 +77,22 @@ class SeleniumTestCase(unittest.TestCase):
                          username='john', password='cat',
                          role=admin_role, confirmed=True)
             db.session.add(admin)
-            db.session.commit()
-
-            # 在线程中启动 Flask 服务器
-            threading.Thread(target=cls.app.run).start()
-
-            # 等待 1s 确保服务器已启动
-            time.sleep(1)
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
 
     @classmethod
     def tearDownClass(cls):
         '''在所有测试后运行, 清理测试环境'''
         if cls.client:
-            # 关闭 Flask 服务器和浏览器
-            cls.client.get('http://127.0.0.1:5000/shutdown')
+            # 关闭浏览器
             #cls.client.close()  # 关闭当前窗口
             cls.client.quit()  # 关闭所有关联窗口
 
             # 销毁数据库
             db.drop_all()
             db.session.remove()
-
-            # 删除程序上下文
-            cls.app_context.pop()
 
     def setUp(self):
         '''在每个测试前运行, 初始化测试环境'''

@@ -1,17 +1,18 @@
 # coding: utf-8
-import unittest
 import time
 from datetime import datetime
+from flask_testing import TestCase
 from app import create_app, db
 from app.models import User, AnonymousUser, Role, Permission, Follow
 
 
-class UserModelTestCase(unittest.TestCase):
+class UserModelTestCase(TestCase):
+    def create_app(self):
+        '''创建 app'''
+        return create_app('testing')
+
     def setUp(self):
         '''在每个测试前运行, 初始化测试环境'''
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
         db.create_all()
         Role.insert_roles()
 
@@ -19,7 +20,6 @@ class UserModelTestCase(unittest.TestCase):
         '''在每个测试后运行, 清理测试环境'''
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()
 
     def test_password_setter(self):
         '''测试可生成Hash'''

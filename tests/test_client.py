@@ -1,26 +1,25 @@
 # coding: utf-8
 import re
-import unittest
 from flask import url_for, request
+from flask_testing import TestCase
 from app import create_app, db
 from app.models import User, Role
 
 
-class FlaskClientTestCase(unittest.TestCase):
+class FlaskClientTestCase(TestCase):
+    def create_app(self):
+        '''创建 app'''
+        return create_app('testing')
+
     def setUp(self):
         '''在每个测试前运行, 初始化测试环境'''
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
         db.create_all()
         Role.insert_roles()
-        self.client = self.app.test_client(use_cookies=True)  # Flask测试客户端对象
 
     def tearDown(self):
         '''在每个测试后运行, 清理测试环境'''
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()
 
     def test_home_page(self):
         '''测试主页'''

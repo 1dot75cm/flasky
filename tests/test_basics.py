@@ -1,22 +1,22 @@
 # coding: utf-8
-import unittest
 from flask import current_app
+from flask_testing import TestCase
 from app import create_app, db
 
 
-class BasicsTestCase(unittest.TestCase):
+class BasicsTestCase(TestCase):
+    def create_app(self):
+        '''创建 app'''
+        return create_app('testing')
+
     def setUp(self):
         '''在每个测试前运行, 初始化测试环境'''
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
         db.create_all()
 
     def tearDown(self):
         '''在每个测试后运行, 清理测试环境'''
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()
 
     def test_app_exists(self):
         '''测试应用实例存在'''
