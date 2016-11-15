@@ -18,7 +18,7 @@ if os.path.exists('.env'):
             if len(var) == 2:
                 os.putenv(var[0], var[1])
 
-from app import create_app, db
+from app import create_app, db, ma
 from app.models import User, Follow, Role, Permission, Post, Comment, Tag,\
     Category, BlogView, OAuth, OAuthType, Chrome, Package, Release
 from flask_script import Manager, Shell
@@ -37,10 +37,10 @@ migrate = Migrate(app, db, render_as_batch=is_sqlite)
 
 def make_shell_context():
     '''定义向Shell导入的对象'''
-    return dict(app=app, db=db, User=User, Follow=Follow, Role=Role,
-                Permission=Permission, Post=Post, Comment=Comment,
-                Tag=Tag, Category=Category, BlogView=BlogView, OAuth=OAuth,
-                OAuthType=OAuthType, Chrome=Chrome, Package=Package, Release=Release)
+    return dict(app=app, db=db, ma=ma, User=User, Follow=Follow, Role=Role,
+                Permission=Permission, Post=Post, Comment=Comment, Tag=Tag,
+                Category=Category, BlogView=BlogView, OAuth=OAuth, OAuthType=OAuthType,
+                Chrome=Chrome, Package=Package, Release=Release)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
 

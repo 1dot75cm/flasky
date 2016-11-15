@@ -5,6 +5,7 @@ from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_oauthlib.client import OAuth
@@ -31,6 +32,7 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy(metadata=metadata)
+ma = Marshmallow()
 pagedown = PageDown()
 oauth = OAuth()
 fas = FAS(Flask(__name__))

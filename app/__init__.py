@@ -1,8 +1,8 @@
 # coding: utf-8
 import os
 from flask import Flask, request, session
-from .ext import (bootstrap, mail, moment, db, login_manager, pagedown, oauth, fas,
-    babel, cache, cache_control, compress, qrcode, whooshalchemy)
+from .ext import (bootstrap, mail, moment, db, ma, login_manager, pagedown, oauth,
+    fas, babel, cache, cache_control, compress, qrcode, whooshalchemy)
 from .models import Post, Comment, Category, Tag, BlogView
 from config import config
 
@@ -37,6 +37,7 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    ma.init_app(app)  # 必须在 Flask-SQLAlchemy 后初始化
     login_manager.init_app(app)
     pagedown.init_app(app)
     oauth.init_app(app)
