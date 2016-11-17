@@ -1,31 +1,43 @@
 # coding: utf-8
 from flask import jsonify, request, current_app, url_for
 from . import api
-from .. import cache
-from ..models import User, Post
+from .utils import get_data
+from .. import cache, db
+from ..models import User, Post, Follow
+from ..schemas import user_schema, users_schema, post_schema, posts_schema
 
 
 @api.route('/users/')
 @cache.memoize(timeout=600)
 def get_users():
     '''获取用户列表'''
-    page = request.args.get('page', 1, type=int)
-    pagination = User.query.paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-        error_out=False)
-    users = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('api.get_users', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('api.get_users', page=page+1, _external=True)
+    query = User.query
+    items, prev, next, total = get_data(
+        query, users_schema, 'api.get_users')
     return jsonify({
-        'posts': [user.to_json() for user in users],
+        'self': items.data,
         'prev': prev,
         'next': next,
-        'count': pagination.total
+        'count': total
     })
+
+
+@api.route('/users/', methods=['POST'])
+def new_user():
+    '''创建新用户'''
+    json_data = request.get_json()
+    if not json_data:
+        return jsonify({'message': 'No input data provided'}), 400
+    user, errors = user_schema.load(json_data)
+    if errors:
+        return jsonify(errors), 422
+    db.session.add(user)
+    db.session.commit()
+    result = user_schema.dump(user)
+    return jsonify({
+        'message': 'Created new user.',
+        'self': result.data
+    }), 201
 
 
 @api.route('/users/<int:id>')
@@ -33,7 +45,7 @@ def get_users():
 def get_user(id):
     '''获取用户'''
     user = User.query.get_or_404(id)
-    return jsonify(user.to_json())
+    return user_schema.jsonify(user)
 
 
 @api.route('/users/<int:id>/posts/')
@@ -41,22 +53,14 @@ def get_user(id):
 def get_user_posts(id):
     '''获取用户的文章列表'''
     user = User.query.get_or_404(id)
-    page = request.args.get('page', 1, type=int)
-    pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-        error_out=False)
-    posts = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('api.get_user_posts', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('api.get_user_posts', page=page+1, _external=True)
+    query = user.posts.order_by(Post.timestamp.desc())
+    items, prev, next, total = get_data(
+        query, posts_schema, 'api.get_user_posts', id)
     return jsonify({
-        'posts': [post.to_json() for post in posts],
+        'self': items.data,
         'prev': prev,
         'next': next,
-        'count': pagination.total
+        'count': total
     })
 
 
@@ -65,20 +69,62 @@ def get_user_posts(id):
 def get_user_followed_posts(id):
     '''获取被关注用户的文章列表'''
     user = User.query.get_or_404(id)
-    page = request.args.get('page', 1, type=int)
-    pagination = user.followed_posts.order_by(Post.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-        error_out=False)
-    posts = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('api.get_user_followed_posts', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('api.get_user_followed_posts', page=page+1, _external=True)
+    query = user.followed_posts.order_by(Post.timestamp.desc())
+    items, prev, next, total = get_data(
+        query, posts_schema, 'api.get_user_followed_posts', id)
     return jsonify({
-        'posts': [post.to_json() for post in posts],
+        'self': items.data,
         'prev': prev,
         'next': next,
-        'count': pagination.total
+        'count': total
+    })
+
+
+@api.route('/users/<int:id>/favorite/')
+@cache.memoize(timeout=600)
+def get_user_favorite_posts(id):
+    '''获取用户收藏文章'''
+    user = User.query.get_or_404(id)
+    query = user.favorite_posts.order_by(Post.timestamp.desc())
+    items, prev, next, total = get_data(
+        query, posts_schema, 'api.get_user_favorite_posts', id)
+    return jsonify({
+        'self': items.data,
+        'prev': prev,
+        'next': next,
+        'count': total
+    })
+
+
+@api.route('/users/<int:id>/followers/')
+@cache.memoize(timeout=600)
+def get_user_followers(id):
+    '''获取用户粉丝'''
+    user = User.query.get_or_404(id)
+    query = User.query.join(Follow, Follow.follower_id == User.id)\
+        .filter(Follow.followed_id == user.id)
+    items, prev, next, total = get_data(
+        query, users_schema, 'api.get_user_followers', id)
+    return jsonify({
+        'self': items.data,
+        'prev': prev,
+        'next': next,
+        'count': total
+    })
+
+
+@api.route('/users/<int:id>/following/')
+@cache.memoize(timeout=600)
+def get_user_following(id):
+    '''获取受关注的用户'''
+    user = User.query.get_or_404(id)
+    query = User.query.join(Follow, Follow.followed_id == User.id)\
+        .filter(Follow.follower_id == user.id)
+    items, prev, next, total = get_data(
+        query, users_schema, 'api.get_user_following', id)
+    return jsonify({
+        'self': items.data,
+        'prev': prev,
+        'next': next,
+        'count': total
     })

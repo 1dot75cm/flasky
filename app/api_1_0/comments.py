@@ -2,30 +2,24 @@
 from flask import jsonify, request, g, url_for, current_app
 from .. import db, cache
 from ..models import Post, Permission, Comment
+from ..schemas import comment_schema, comments_schema
 from . import api
 from .decorators import permission_required
+from .utils import get_data
 
 
 @api.route('/comments/')
 @cache.memoize(timeout=600)
 def get_comments():
     '''获取评论列表'''
-    page = request.args.get('page', 1, type=int)
-    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
-        error_out=False)
-    comments = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('api.get_comments', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('api.get_comments', page=page+1, _external=True)
+    query = Comment.query.order_by(Comment.timestamp.desc())
+    items, prev, next, total = get_data(
+        query, comments_schema, 'api.get_comments', type='comment')
     return jsonify({
-        'comments': [comment.to_json() for comment in comments],
+        'self': items.data,
         'prev': prev,
         'next': next,
-        'count': pagination.total
+        'count': total
     })
 
 
@@ -34,7 +28,7 @@ def get_comments():
 def get_comment(id):
     '''获取评论'''
     comment = Comment.query.get_or_404(id)
-    return jsonify(comment.to_json())
+    return comment_schema.jsonify(comment)
 
 
 @api.route('/posts/<int:id>/comments/')
@@ -42,22 +36,14 @@ def get_comment(id):
 def get_post_comments(id):
     '''获取文章的评论列表'''
     post = Post.query.get_or_404(id)
-    page = request.args.get('page', 1, type=int)
-    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
-        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
-        error_out=False)
-    comments = pagination.items
-    prev = None
-    if pagination.has_prev:
-        prev = url_for('api.get_post_comments', page=page-1, _external=True)
-    next = None
-    if pagination.has_next:
-        next = url_for('api.get_post_comments', page=page+1, _external=True)
+    query = post.comments.order_by(Comment.timestamp.asc())
+    items, prev, next, total = get_data(
+        query, comments_schema, 'api.get_post_comments', type='comment')
     return jsonify({
-        'comments': [comment.to_json() for comment in comments],
+        'self': items.data,
         'prev': prev,
         'next': next,
-        'count': pagination.total
+        'count': total
     })
 
 
@@ -66,11 +52,16 @@ def get_post_comments(id):
 def new_post_comment(id):
     '''为文章撰写新评论'''
     post = Post.query.get_or_404(id)
-    comment = Comment.from_json(request.json)
+    json_data = request.get_json()
+    if not json_data:
+        return jsonify({'message': 'No input data provided'}), 400
+    comment, errors = comment_schema.load(json_data)
+    if errors:
+        return jsonify(errors), 422
     comment.author = g.current_user
     comment.post = post
     db.session.add(comment)
     db.session.commit()
-    return jsonify(comment.to_json()), 201, \
+    return comment_schema.jsonify(comment), 201, \
         {'Location': url_for('api.get_comment', id=comment.id,
                              _external=True)}

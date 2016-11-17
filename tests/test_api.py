@@ -130,7 +130,7 @@ class APITestCase(TestCase):
             url_for('api.new_post'),
             headers=self.get_api_headers('john@example.com', 'cat'),
             data=json.dumps({'body': ''}))
-        self.assertTrue(response.status_code == 400)
+        self.assertTrue(response.status_code == 422)
 
         # write a post
         response = self.client.post(
@@ -153,6 +153,8 @@ class APITestCase(TestCase):
         self.assertTrue(json_response['body_html'] ==
                         '<p>body of the <em>blog</em> post</p>')
         json_post = json_response
+        json_post.pop('body')
+        json_post.pop('body_html')
 
         # get the post from the user
         response = self.client.get(
@@ -160,9 +162,9 @@ class APITestCase(TestCase):
             headers=self.get_api_headers('john@example.com', 'cat'))
         self.assertTrue(response.status_code == 200)
         json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('posts'))
+        self.assertIsNotNone(json_response.get('self'))
         self.assertTrue(json_response.get('count', 0) == 1)
-        self.assertTrue(json_response['posts'][0] == json_post)
+        self.assertTrue(json_response['self'][0] == json_post)
 
         # get the post from the user as a follower
         response = self.client.get(
@@ -170,9 +172,9 @@ class APITestCase(TestCase):
             headers=self.get_api_headers('john@example.com', 'cat'))
         self.assertTrue(response.status_code == 200)
         json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('posts'))
+        self.assertIsNotNone(json_response.get('self'))
         self.assertTrue(json_response.get('count', 0) == 1)
-        self.assertTrue(json_response['posts'][0] == json_post)
+        self.assertTrue(json_response['self'][0] == json_post)
 
         # edit post
         response = self.client.put(
@@ -260,7 +262,7 @@ class APITestCase(TestCase):
             headers=self.get_api_headers('susan@example.com', 'dog'))
         self.assertTrue(response.status_code == 200)
         json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('comments'))
+        self.assertIsNotNone(json_response.get('self'))
         self.assertTrue(json_response.get('count', 0) == 2)
 
         # get all the comments
@@ -269,5 +271,5 @@ class APITestCase(TestCase):
             headers=self.get_api_headers('susan@example.com', 'dog'))
         self.assertTrue(response.status_code == 200)
         json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('comments'))
+        self.assertIsNotNone(json_response.get('self'))
         self.assertTrue(json_response.get('count', 0) == 2)
