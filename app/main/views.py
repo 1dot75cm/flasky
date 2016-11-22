@@ -53,8 +53,8 @@ def search():
         return redirect(url_for('.search', query=query))
     if query and session.get('allow_search'):
         session['allow_search'] = False
-        posts = Post.query.whoosh_search(query,
-            current_app.config['MAX_SEARCH_RESULTS']).all()
+        posts = Post.query.whoosh_search(
+            query, current_app.config['MAX_SEARCH_RESULTS']).all()
         return render_template('search.html', query=query, posts=posts)
     return redirect(url_for('.index'))
 

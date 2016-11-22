@@ -1,8 +1,9 @@
 # coding: utf-8
 import os
 from flask import Flask, request, session
-from .ext import (bootstrap, mail, moment, db, ma, login_manager, pagedown, oauth,
-    fas, babel, cache, cache_control, compress, qrcode, whooshalchemy)
+from .ext import (bootstrap, mail, moment, db, ma, login_manager, pagedown,
+                  oauth, fas, babel, cache, cache_control, compress, qrcode,
+                  whooshalchemy)
 from .models import Post, Comment, Category, Tag, BlogView
 from config import config
 

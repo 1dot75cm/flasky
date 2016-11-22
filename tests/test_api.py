@@ -54,7 +54,8 @@ class APITestCase(TestCase):
         # add a user
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True, role=r)
+        u = User(email='john@example.com', password='cat',
+                 confirmed=True, role=r)
         db.session.add(u)
         db.session.commit()
 
@@ -69,7 +70,8 @@ class APITestCase(TestCase):
         # add a user
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True, role=r)
+        u = User(email='john@example.com', password='cat',
+                 confirmed=True, role=r)
         db.session.add(u)
         db.session.commit()
 
@@ -106,7 +108,8 @@ class APITestCase(TestCase):
         # add an unconfirmed user
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=False, role=r)
+        u = User(email='john@example.com', password='cat',
+                 confirmed=False, role=r)
         db.session.add(u)
         db.session.commit()
 
@@ -121,7 +124,8 @@ class APITestCase(TestCase):
         # add a user
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True, role=r)
+        u = User(email='john@example.com', password='cat',
+                 confirmed=True, role=r)
         db.session.add(u)
         db.session.commit()
 
@@ -136,7 +140,10 @@ class APITestCase(TestCase):
         response = self.client.post(
             url_for('api.new_post'),
             headers=self.get_api_headers('john@example.com', 'cat'),
-            data=json.dumps({'title': 'title', 'body': 'body of the *blog* post'}))
+            data=json.dumps({
+                'title': 'title', 'body': 'body of the *blog* post'
+            })
+        )
         self.assertTrue(response.status_code == 201)
         url = response.headers.get('Location')
         self.assertIsNotNone(url)
@@ -239,8 +246,10 @@ class APITestCase(TestCase):
         json_response = json.loads(response.data.decode('utf-8'))
         url = response.headers.get('Location')
         self.assertIsNotNone(url)
-        self.assertTrue(json_response['body'] == 'Good [post](http://example.com)!')
-        self.assertTrue(re.sub('<.*?>', '', json_response['body_html']) == 'Good post!')
+        self.assertTrue(
+            json_response['body'] == 'Good [post](http://example.com)!')
+        self.assertTrue(
+            re.sub('<.*?>', '', json_response['body_html']) == 'Good post!')
 
         # get the new comment
         response = self.client.get(
@@ -249,7 +258,8 @@ class APITestCase(TestCase):
         self.assertTrue(response.status_code == 200)
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertTrue(json_response['url'] == url)
-        self.assertTrue(json_response['body'] == 'Good [post](http://example.com)!')
+        self.assertTrue(
+            json_response['body'] == 'Good [post](http://example.com)!')
 
         # add another comment
         comment = Comment(body='Thank you!', author=u1, post=post)

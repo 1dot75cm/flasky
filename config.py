@@ -4,10 +4,10 @@ from whoosh.analysis import StemmingAnalyzer
 import os
 basedir = os.path.abspath(os.getcwd())
 datadir = os.path.join(basedir, 'data')
-logdir  = os.path.join(datadir, 'logs')
-covdir  = os.path.join(datadir, 'coverage')
-bindir  = os.path.join(datadir, 'bin')
-prodir  = os.path.join(datadir, 'profile')
+logdir = os.path.join(datadir, 'logs')
+covdir = os.path.join(datadir, 'coverage')
+bindir = os.path.join(datadir, 'bin')
+prodir = os.path.join(datadir, 'profile')
 
 
 class Config:
@@ -31,7 +31,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY') or 'secret_key_string'  # 用于加密 session 的密钥
     SSL_DISABLE = False  # 启用 SSL, debug/testing 不生效
     WTF_I18N_ENABLED = True
-    WTF_CSRF_SECRET_KEY = 'random key for form' # for csrf protection
+    WTF_CSRF_SECRET_KEY = 'random key for form'  # for csrf protection
     # https://github.com/xpleaf/Blog_mini/blob/master/config.py
     # Take good care of 'SECRET_KEY' and 'WTF_CSRF_SECRET_KEY', if you use the
     # bootstrap extension to create a form, it is Ok to use 'SECRET_KEY',
@@ -45,26 +45,26 @@ class Config:
 
     # GitHub OAuth2
     GITHUB = dict(
-        consumer_key = os.getenv('GITHUB_ID'),
-        consumer_secret = os.getenv('GITHUB_SECRET'),
-        base_url = 'https://api.github.com/',
-        request_token_url = None,
-        request_token_params = {'scope': 'user:email'},
-        access_token_method = 'POST',
-        access_token_url = 'https://github.com/login/oauth/access_token',
-        authorize_url = 'https://github.com/login/oauth/authorize'
+        consumer_key=os.getenv('GITHUB_ID'),
+        consumer_secret=os.getenv('GITHUB_SECRET'),
+        base_url='https://api.github.com/',
+        request_token_url=None,
+        request_token_params={'scope': 'user:email'},
+        access_token_method='POST',
+        access_token_url='https://github.com/login/oauth/access_token',
+        authorize_url='https://github.com/login/oauth/authorize'
     )
 
     # Google OAuth2
     GOOGLE = dict(
-        consumer_key = os.getenv('GOOGLE_ID'),
-        consumer_secret = os.getenv('GOOGLE_SECRET'),
+        consumer_key=os.getenv('GOOGLE_ID'),
+        consumer_secret=os.getenv('GOOGLE_SECRET'),
         base_url='https://www.googleapis.com/oauth2/v2/',
-        request_token_params = {'scope': 'email'},
-        request_token_url = None,
-        access_token_method = 'POST',
-        access_token_url = 'https://accounts.google.com/o/oauth2/token',
-        authorize_url = 'https://accounts.google.com/o/oauth2/auth'
+        request_token_params={'scope': 'email'},
+        request_token_url=None,
+        access_token_method='POST',
+        access_token_url='https://accounts.google.com/o/oauth2/token',
+        authorize_url='https://accounts.google.com/o/oauth2/auth'
     )
 
     # Fedora FAS OpenID
@@ -72,7 +72,8 @@ class Config:
     FAS_OPENID_CHECK_CERT = True
 
     # Post categories
-    DEFAULT_CATEGORY = ['Python', 'JavaScript', 'CentOS', 'Fedora', 'MySQL', 'Redis']
+    DEFAULT_CATEGORY = ['Python', 'JavaScript', 'CentOS', 'Fedora', 'MySQL',
+                        'Redis']
 
     # RPM package tool
     DEFAULT_RELEASES = ['F22', 'F23', 'F24', 'F25']
@@ -90,8 +91,8 @@ class Config:
 
     # Available languages
     LANGUAGES = dict(
-        en_US = ['English', 'en_US'],
-        zh_Hans = ['简体中文', 'zh_CN']
+        en_US=['English', 'en_US'],
+        zh_Hans=['简体中文', 'zh_CN']
     )
     BABEL_DEFAULT_LOCALE = 'en'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
@@ -103,13 +104,13 @@ class Config:
     CACHE_THRESHOLD = 1000  # 最大缓存条数
 
     # Cache for redis
-    #CACHE_TYPE = 'redis'
-    #CACHE_KEY_PREFIX = 'flasky'  # 在键之前添加前缀, 区分不同应用程序
-    #CACHE_REDIS_URL = 'redis://user:password@localhost:6379/2'
-    #CACHE_REDIS_HOST = 'localhost'
-    #CACHE_REDIS_PORT = 6379
-    #CACHE_REDIS_PASSWORD = 'password'
-    #CACHE_REDIS_DB = 0  # db库
+    # CACHE_TYPE = 'redis'
+    # CACHE_KEY_PREFIX = 'flasky'  # 在键之前添加前缀, 区分不同应用程序
+    # CACHE_REDIS_URL = 'redis://user:password@localhost:6379/2'
+    # CACHE_REDIS_HOST = 'localhost'
+    # CACHE_REDIS_PORT = 6379
+    # CACHE_REDIS_PASSWORD = 'password'
+    # CACHE_REDIS_DB = 0  # db库
 
     COMPRESS_LEVEL = 6  # Gzip 压缩级别
     COMPRESS_MIN_SIZE = 500  # 最小压缩大小

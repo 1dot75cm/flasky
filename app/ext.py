@@ -1,5 +1,5 @@
 # coding: utf-8
-import flask_whooshalchemyplus as whooshalchemy
+import flask_whooshalchemyplus as whooshalchemy  # noqa
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
@@ -14,13 +14,13 @@ from flask_babel import Babel, lazy_gettext
 from flask_cache import Cache
 from flask_cachecontrol import FlaskCacheControl
 from flask_compress import Compress
-from flask_qrcode import QRcode
+from flask_qrcode import QRcode  # noqa
 from .qrcodex import QRcodeEx
 from sqlalchemy import MetaData
 
 # SQLite naming convention
 # https://github.com/miguelgrinberg/Flask-Migrate/issues/61#issuecomment-208131722
-metadata = MetaData(naming_convention = {
+metadata = MetaData(naming_convention={
     'ix': 'ix_%(column_0_label)s',  # index
     'uq': 'uq_%(table_name)s_%(column_0_name)s',  # unique
     'ck': 'ck_%(table_name)s_%(column_0_name)s',  # check

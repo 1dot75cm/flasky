@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import jsonify, request, g, abort, url_for, current_app
+from flask import jsonify, request, g, url_for
 from .. import db, cache
 from ..models import Post, Permission
 from ..schemas import post_schema, posts_schema

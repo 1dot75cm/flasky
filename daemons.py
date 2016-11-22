@@ -1,4 +1,5 @@
 #!venv/bin/python
+from __future__ import print_function
 import os
 import time
 import daemon
@@ -19,12 +20,14 @@ context = daemon.DaemonContext(
     stderr=open(os.path.join(logdir, "STDERR"), 'a+'),
     pidfile=lockfile.FileLock(os.path.join(logdir, "daemon.pid")))
 
+
 def echo(data):
     now = time.strftime('[%y/%m/%d %H:%M:%S] ', time.localtime())
-    print now + data
+    print(now + data)
+
 
 if __name__ == '__main__':
-    print 'Run daemon.'
+    print('Run daemon.')
     with context:
         app = create_app('default')
         ctx = app.app_context()

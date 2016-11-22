@@ -209,7 +209,7 @@ class UserModelTestCase(TestCase):
         db.session.add(u)
         db.session.commit()
         json_user = u.to_json()
-        expected_keys = ['url', 'username', 'email', 'member_since', 'last_seen',
-                         'posts', 'followed_posts', 'post_count']
-        self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
+        expect_keys = ['url', 'username', 'email', 'member_since', 'last_seen',
+                       'posts', 'followed_posts', 'post_count']
+        self.assertEqual(sorted(json_user.keys()), sorted(expect_keys))
         self.assertTrue('/api/v1.0/users/' in json_user['url'])

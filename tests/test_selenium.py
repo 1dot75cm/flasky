@@ -18,7 +18,8 @@ def download_webdriver():
 
     resp = requests.get('https://github.com/mozilla/geckodriver/releases')
     tree = etree.HTML(resp.content)
-    url = tree.xpath('//div[contains(@class, "label-latest")]//a[contains(@href, "linux64")]/@href')[0]
+    url = tree.xpath('//div[contains(@class, "label-latest")]'
+                     '//a[contains(@href, "linux64")]/@href')[0]
 
     tgz_fname = url.split('/')[-1]
     tgz_fpath = os.path.join(datadir, tgz_fname)
@@ -87,7 +88,7 @@ class SeleniumTestCase(LiveServerTestCase):
         '''在所有测试后运行, 清理测试环境'''
         if cls.client:
             # 关闭浏览器
-            #cls.client.close()  # 关闭当前窗口
+            # cls.client.close()  # 关闭当前窗口
             cls.client.quit()  # 关闭所有关联窗口
 
             # 销毁数据库

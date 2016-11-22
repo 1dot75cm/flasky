@@ -1,6 +1,6 @@
 # coding: utf-8
 import re
-from flask import url_for, request
+from flask import url_for
 from flask_testing import TestCase
 from app import create_app, db
 from app.models import User, Role
@@ -43,7 +43,8 @@ class FlaskClientTestCase(TestCase):
             'password': 'cat'
         }, follow_redirects=True)  # 自动重定向, 返回 GET 请求的响应
         self.assertTrue(re.search(b'Hello,\s+john!', response.data))
-        self.assertTrue(b'You have not confirmed your account yet' in response.data)
+        self.assertTrue(
+            b'You have not confirmed your account yet' in response.data)
 
         # send a confirmation token
         user = User.query.filter_by(email='john@example.com').first()
@@ -53,5 +54,6 @@ class FlaskClientTestCase(TestCase):
         self.assertTrue(b'You have confirmed your account' in response.data)
 
         # log out
-        response = self.client.get(url_for('auth.logout'), follow_redirects=True)
+        response = self.client.get(url_for('auth.logout'),
+                                   follow_redirects=True)
         self.assertTrue(b'You have been logged out' in response.data)

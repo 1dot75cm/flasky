@@ -1,4 +1,5 @@
 # coding: utf-8
+# flake8: noqa
 try:  # py3
     from urllib import request
     from urllib.request import urlopen
@@ -13,7 +14,7 @@ except:  # py2
 import xml.etree.ElementTree as tree
 import random
 import time
-import ssl
+# import ssl
 import re
 
 
@@ -29,8 +30,8 @@ def get(url, data=None, method='GET', timeout=200):
     header['User-Agent'] = random.choice(ualist)
 
     req = request.Request(method=method, url=url, data=data, headers=header)
-    #req.set_proxy('127.0.0.1:8118', 'https')
-    #context = ssl._create_unverified_context()
+    # req.set_proxy('127.0.0.1:8118', 'https')
+    # context = ssl._create_unverified_context()
     try:  # py2
         s = request.Session()
         resp = s.send(req.prepare())
@@ -52,7 +53,7 @@ def post(os, branch, arch):
     ''' 返回 POST 数据
     return bytes '''
     vers = '6.3' if os == 'win' else '46.0.2490.86'
-    key = os +'_'+ branch
+    key = os + '_' + branch
 
     # Windows - {GUID}; Mac - bundle ID (com.google.appname)
     appid = {
@@ -77,7 +78,7 @@ def post(os, branch, arch):
     }
     data = '''<?xml version='1.0' encoding='UTF-8'?>
 <request protocol='3.0' version='1.3.23.0' ismachine='0'>
-    <hw sse='1' sse2='1' sse3='1' ssse3='1' sse41='1' sse42='1' avx='1' physmemory='12582912' />
+    <hw sse='1' sse2='1' sse3='1' sse41='1' sse42='1' physmemory='12582912' />
     <os platform='{0}' version='{1}' arch='x64'/>
     <app appid='{2}' ap='{3}'>
         <updatecheck/>
@@ -132,16 +133,17 @@ def get_rpm_info(branch):
         'beta': 'google-chrome-beta',
         'dev': 'google-chrome-unstable'
     }
-    metafile = ['repomd.xml', 'primary.xml.gz', 'filelists.xml.gz', 'other.xml.gz']
+    metafile = ['repomd.xml', 'primary.xml.gz',
+                'filelists.xml.gz', 'other.xml.gz']
 
-    meta_xml = get(url + arch +'/repodata/'+ metafile[1])
+    meta_xml = get(url + arch + '/repodata/' + metafile[1])
     metas = re.findall('<name.*?<format>', meta_xml, re.S)
     pattern = '.*ver="(.+?)".*>(.{40})<.*file="(.+?)".*package="(.+?)".*href="(.+)"'
     for meta in metas:
-        pkg_info = re.match('.*'+ pkgname[branch] + pattern, meta, re.S)
+        pkg_info = re.match('.*' + pkgname[branch] + pattern, meta, re.S)
         if pkg_info:
             break
-    pkg_uri = arch +'/'+ pkg_info.group(5)
+    pkg_uri = arch + '/' + pkg_info.group(5)
 
     return {
         'timestamp': pkg_info.group(3),
@@ -167,10 +169,10 @@ def get_deb_info(branch):
     }
     metafile = 'Packages.gz'
 
-    meta_inf = get(url +'dists/stable/main/binary-amd64/'+ metafile)
+    meta_inf = get(url + 'dists/stable/main/binary-amd64/' + metafile)
     for i in ['stable', 'beta', 'dev']:
         off = meta_inf.find(pkgname[i])
-        meta_inf = meta_inf[:off-9] + '[%s]\n'%i + meta_inf[off-9:]
+        meta_inf = meta_inf[:off-9] + '[%s]\n' % i + meta_inf[off-9:]
     config = configparser.ConfigParser()
     try:  # py3
         config.read_string(meta_inf)

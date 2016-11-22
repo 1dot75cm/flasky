@@ -97,31 +97,31 @@ comment_schema = CommentSchema()
 comments_schema = CommentSchema(many=True, only=COMMENT_SCHEMA_ONLY)
 
 
-#class BlogViewSchema(ma.ModelSchema):
-#    class Meta:
-#        model = BlogView
+# class BlogViewSchema(ma.ModelSchema):
+#     class Meta:
+#         model = BlogView
 
 
-#class OAuthSchema(ma.ModelSchema):
-#    class Meta:
-#        model = OAuth
+# class OAuthSchema(ma.ModelSchema):
+#     class Meta:
+#         model = OAuth
 
 
-#class OAuthTypeSchema(ma.ModelSchema):
-#    class Meta:
-#        model = OAuthType
+# class OAuthTypeSchema(ma.ModelSchema):
+#     class Meta:
+#         model = OAuthType
 
 
-#class ChromeSchema(ma.ModelSchema):
-#    class Meta:
-#        model = Chrome
+# class ChromeSchema(ma.ModelSchema):
+#     class Meta:
+#         model = Chrome
 
 
-#class PackageSchema(ma.ModelSchema):
-#    class Meta:
-#        model = Package
+# class PackageSchema(ma.ModelSchema):
+#     class Meta:
+#         model = Package
 
 
-#class ReleaseSchema(ma.ModelSchema):
-#    class Meta:
-#        model = Release
+# class ReleaseSchema(ma.ModelSchema):
+#     class Meta:
+#         model = Release

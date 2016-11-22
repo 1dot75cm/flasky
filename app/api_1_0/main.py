@@ -1,8 +1,9 @@
 # coding: utf-8
-from flask import jsonify, url_for, request, send_file, abort
+from flask import jsonify, url_for, request, send_file
 from . import api
 from .errors import bad_request
 from .. import cache, qrcode
+
 
 @api.route('/')
 def main():
@@ -25,16 +26,16 @@ def main():
 def get_qrcode():
     '''生成二维码'''
     _request = request.args or request.json
-    url = _request.get('url', None)           # 数据
-    version = _request.get('version', None)   # 图片尺寸
-    correct = _request.get('correct', 'L')    # 纠错级别
-    box_size = _request.get('box_size', 10)   # 像素大小
-    border = _request.get('border', 1)        # 边框大小
-    fcolor = _request.get('fcolor', 'black')  # 前景色
-    bcolor = _request.get('bcolor', 'white')  # 背景色
-    factor = _request.get('factor', 4)        # 小图标是二维码的 1/4
-    icon = _request.get('icon', 'fedora.png') # 小图标
-    box = _request.get('box', None)           # 小图标位置 "left, top"
+    url = _request.get('url', None)            # 数据
+    version = _request.get('version', None)    # 图片尺寸
+    correct = _request.get('correct', 'L')     # 纠错级别
+    box_size = _request.get('box_size', 10)    # 像素大小
+    border = _request.get('border', 1)         # 边框大小
+    fcolor = _request.get('fcolor', 'black')   # 前景色
+    bcolor = _request.get('bcolor', 'white')   # 背景色
+    factor = _request.get('factor', 4)         # 小图标是二维码的 1/4
+    icon = _request.get('icon', 'fedora.png')  # 小图标
+    box = _request.get('box', None)            # 小图标位置 "left, top"
     box = box.split(',') if box else None
 
     try:

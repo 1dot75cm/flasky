@@ -365,6 +365,7 @@ class AnonymousUser(AnonymousUserMixin):
     def is_administrator(self):
         return False
 
+
 login_manager.anonymous_user = AnonymousUser
 
 
@@ -374,7 +375,8 @@ def load_user(user_id):
     return User.query.get(int(user_id))  # 返回用户对象或 None
 
 
-favorite_relationship = db.Table('favorite_relationship',
+favorite_relationship = db.Table(
+    'favorite_relationship',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
 
@@ -478,6 +480,7 @@ class Post(db.Model):
     def __repr__(self):
         return '<Post %r>' % self.title
 
+
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 # on_changed_body 函数注册在 body 字段上, 是 SQLAlchemy 'set' 事件的监听程序,
 # 只要 Post 类实例的 body 字段设置了新值, 就会自动调用 on_changed_body 函数渲染 HTML
@@ -552,6 +555,7 @@ class Comment(db.Model):
             db.session.commit()
         except:
             db.session.rollback()
+
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)  # 定义事件, 修改 body 时, 渲染 md
 
@@ -783,7 +787,7 @@ class Package(db.Model):
             if p is None:
                 p = Package(
                     name=pkg.sourcerpm.split('.src.rpm')[0],
-                    pkgnames=json.dumps({'i386':[], 'x86_64':[]}),
+                    pkgnames=json.dumps({'i386': [], 'x86_64': []}),
                     task_id=Package.generate_task_id(),
                     release=Release.query.filter_by(name=release).first(),
                     deadline=current_app.config['PKG_DEADLINE'])

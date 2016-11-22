@@ -1,6 +1,7 @@
 # coding: utf-8
 from flask import request, current_app, url_for
 
+
 def get_data(base_query, model_schema, endpoint, id=None, type='post'):
     '''获取 model 信息'''
     config_type = {

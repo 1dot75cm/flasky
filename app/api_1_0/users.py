@@ -1,10 +1,10 @@
 # coding: utf-8
-from flask import jsonify, request, current_app, url_for
+from flask import jsonify, request
 from . import api
 from .utils import get_data
 from .. import cache, db
 from ..models import User, Post, Follow
-from ..schemas import user_schema, users_schema, post_schema, posts_schema
+from ..schemas import user_schema, users_schema, posts_schema
 
 
 @api.route('/users/')
