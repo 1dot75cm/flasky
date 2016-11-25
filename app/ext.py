@@ -15,7 +15,6 @@ from flask_cache import Cache
 from flask_cachecontrol import FlaskCacheControl
 from flask_compress import Compress
 from flask_qrcode import QRcode  # noqa
-from .qrcodex import QRcodeEx
 from sqlalchemy import MetaData
 
 # SQLite naming convention
@@ -40,7 +39,7 @@ babel = Babel()
 cache = Cache()
 cache_control = FlaskCacheControl()
 compress = Compress()
-qrcode = QRcodeEx()
+qrcode = QRcode()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'  # 会话安全等级

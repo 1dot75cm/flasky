@@ -26,6 +26,9 @@ def main():
 def get_qrcode():
     '''生成二维码'''
     _request = request.args or request.json
+    if not hasattr(_request, 'get'):
+        return bad_request('value error')
+
     url = _request.get('url', None)            # 数据
     version = _request.get('version', None)    # 图片尺寸
     correct = _request.get('correct', 'L')     # 纠错级别
@@ -41,9 +44,9 @@ def get_qrcode():
     try:
         if url is None:
             raise ValueError('Need some value')
-        data = qrcode.qrcode(url, mode='raw', version=version, error_correction=correct,
-                             box_size=box_size, border=border, fill_color=fcolor,
-                             back_color=bcolor, factor=factor, icon_img=icon, box=box)
+        data = qrcode(url, mode='raw', version=version, error_correction=correct,
+                      box_size=box_size, border=border, fill_color=fcolor,
+                      back_color=bcolor, factor=factor, icon_img=icon, icon_box=box)
     except:
         return bad_request('value error')
     return send_file(data, mimetype='image/png', cache_timeout=0)
